@@ -19,7 +19,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_PREFIX_PATH "C:/ProgrammingTools/QT/6.6.0/msvc2019_64/lib/cmake/Qt6")
 
 
-# find_package(Qt6 REQUIRED COMPONENTS Core)
+find_package(Qt6 REQUIRED COMPONENTS Core)
 
 # Include sub-projects.
 add_subdirectory ("QTProject")

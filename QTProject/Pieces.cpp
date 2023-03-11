@@ -10,12 +10,16 @@ Pawn::Pawn(int x, int y)
 {
 }
 
-std::wstring Pawn::get_char()
+wchar_t Pawn::get_char(Color color)
 {
-	std::wcout << '\u2659';
-	std::wcout << "\u2659";
-	return std::wstring();
-	// return std::wstring(L"\u2659");
+	switch (color) 
+	{
+	case Color::White:
+		return L'\u2659';
+	case Color::Black:
+		return L'\u265F';
+	}
+	
 }
 
 bool Pawn::move_valid(int x, int y, const ChessGame& a_game)

@@ -38,7 +38,7 @@ public:
 		return !same_pos(x, y) && (this->x == x || this->y == y);
 	}
 
-	virtual std::wstring get_char() = 0;
+	virtual wchar_t get_char(Color color) = 0;
 	virtual bool move_valid(int x, int y, const ChessGame& a_game) = 0;
 };
 
@@ -62,7 +62,7 @@ struct Pawn : public Piece
 {
 	Pawn(int x, int y);
 
-	virtual std::wstring get_char() override;
+	virtual wchar_t get_char(Color color) override;
 	virtual bool move_valid(int x, int y, const ChessGame& a_game) override;
 };
 
