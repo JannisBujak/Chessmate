@@ -4,10 +4,12 @@
 
 #include "ChessGame.h"
 #include <iostream>
+#include <QGraphicsView>
 
 /*Drawing the playing-field here*/
 class Chessboard 
 {
+
 public:
 	void print(const ChessGame& a_game);
 };
