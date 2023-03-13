@@ -11,36 +11,27 @@ using namespace std;
 
 int main(int argc, char** argv)
 {	
-	_setmode(_fileno(stdout), _O_U16TEXT);
-
-	// Chess-stuff
-	ChessGame game;
-	Chessboard board;
-	board.print(game);
-
-
 	// QT-Game-UI
 #define USE_UI true;
 #if USE_UI
-
 	QApplication app(argc, argv);
 
-	QGraphicsScene* gScene = new QGraphicsScene();
+	// Chess-stuff
 	
-	
-	QGraphicsView* view = new QGraphicsView(gScene);
-	auto gv_size = view->size();
+	QGraphicsScene scene;
+	Chessboard chessboard(app, &scene, QSize(960, 540));
 
-	QGraphicsRectItem* rect = new QGraphicsRectItem();
-	rect->setRect(QRectF(0, 0, gv_size.width(), gv_size.height()));
-	gScene->addItem(rect);
+	//app.setActiveWindow(&chessboard);
 
-	
-	view->show();
+	chessboard.display();
+
 	app.exec();
 
 #else 
+	_setmode(_fileno(stdout), _O_U16TEXT);
+	chessboard.print();
 	system("pause");
+
 #endif
 }
 
