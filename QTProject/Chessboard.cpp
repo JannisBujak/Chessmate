@@ -19,6 +19,7 @@ void Chessboard::display()
 		, xSegSize = width / BOARD_WIDTH
 		, ySegSize = height / BOARD_HEIGHT;
 		
+
 	for (int y = 0; y < BOARD_HEIGHT; y++)
 	{
 		for (int x = 0; x < BOARD_WIDTH; x++)
@@ -34,6 +35,13 @@ void Chessboard::display()
 				rect_item->setBrush(QColor(238, 238, 228));
 		}
 	}	
+
+
+	wchar_t w = L'\u2659'
+		, b = L'\u265F';
+
+	QLabel label(QString("%1").arg(w));
+	qDebug() << label.text();
 	show();
 }
 
@@ -63,5 +71,13 @@ void Chessboard::print()
 		}
 		wcout << endl;
 	}
+}
+
+void Chessboard::resizeEvent(QResizeEvent* event)
+{
+	qDebug() << "AAAAAGGGGGG";
+	// fitInView(0, 0, 500, 500, Qt::KeepAspectRatio);
+	display();
+	QGraphicsView::resizeEvent(event);
 }
 

@@ -8,6 +8,7 @@
 #include <QGraphicsRectItem>
 #include <QApplication>
 #include <QMainWindow>
+#include <QLabel>
 
 /*Drawing the playing-field here*/
 class Chessboard : public QGraphicsView
@@ -21,13 +22,7 @@ public:
 	void display();
 	void print();
 
-	void resizeEvent(QResizeEvent* event) override
-	{
-		qDebug() << "AAAAAGGGGGG";
-		// fitInView(0, 0, 500, 500, Qt::KeepAspectRatio);
-		display();
-		QGraphicsView::resizeEvent(event);
-	}
+	void resizeEvent(QResizeEvent* event) override;
 };
 
 
