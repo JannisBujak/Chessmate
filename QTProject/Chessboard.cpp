@@ -8,7 +8,9 @@ Chessboard::Chessboard(QApplication& a_application, QGraphicsScene* a_scene, QSi
 	for (int i = 0; i < BOARD_WIDTH * BOARD_HEIGHT; ++i)
 	{
 		m_rect_items.push_back(std::make_unique<QGraphicsRectItem>());
+		m_labels.push_back(std::make_unique<QLabel>());
 		scene()->addItem(m_rect_items.back().get());
+		scene()->addWidget(m_labels.back().get());
 	}
 }
 
@@ -18,7 +20,10 @@ void Chessboard::display()
 		, height = size().height()
 		, xSegSize = width / BOARD_WIDTH
 		, ySegSize = height / BOARD_HEIGHT;
-		
+	
+	const wchar_t w = L'\u2659'
+		, b = L'\u265F';
+
 
 	for (int y = 0; y < BOARD_HEIGHT; y++)
 	{
@@ -26,6 +31,7 @@ void Chessboard::display()
 		{
 			
 			QGraphicsRectItem* rect_item = m_rect_items[y * BOARD_WIDTH + x].get();
+			QLabel* label = m_labels[y * BOARD_WIDTH + x].get();
 
 			QRectF r(x * xSegSize, y * ySegSize, xSegSize, ySegSize);
 			rect_item->setRect(r);
@@ -33,15 +39,15 @@ void Chessboard::display()
 				rect_item->setBrush(QColor(234, 182, 118));
 			else 
 				rect_item->setBrush(QColor(238, 238, 228));
+
+			QString unicode = "Hello I’ve to go";
+			qDebug() << "Unicode String: " << unicode;
+
+
+			label->setText(QString("%1").arg(w)); 
 		}
-	}	
-
-
-	wchar_t w = L'\u2659'
-		, b = L'\u265F';
-
-	QLabel label(QString("%1").arg(w));
-	qDebug() << label.text();
+	}
+	
 	show();
 }
 
