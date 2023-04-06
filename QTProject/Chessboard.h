@@ -29,13 +29,9 @@ private:
 
 	const QChar qw = QChar(0x59, 0x26);
 
-	const QString m_filename = QString("../../../../QTProject/chess-icon/vecteezy_chess_icon.jpg");
+	const QString m_filename = QString("../../../../QTProject/chess-icon/vecteezy_chess_icon-removebg.png");
 	// const QString m_filename = QString(":/QTProject/chess-icon/vecteezy_chess_icon.jpg");
-	
-	
-	std::vector<QPixmap> m_pxmaps;
-
-
+		
 public:
 	static std::vector<QPixmap> create_pixmaps(int a_xSectors, int a_ySectors, const QPixmap& a_glob_pxmp);
 

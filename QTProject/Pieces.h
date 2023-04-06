@@ -3,6 +3,8 @@
 #define PIECES_H
 
 #include <iostream>
+#include <vector>
+#include <qwidget.h>
 
 class ChessGame;
 
@@ -15,6 +17,7 @@ enum class Color
 struct Piece
 {
 public:
+	static std::vector<QPixmap> glob_ChessPiecesBitmap;
 
 private:
 	int x, y;
@@ -38,32 +41,67 @@ public:
 		return !same_pos(x, y) && (this->x == x || this->y == y);
 	}
 
-	virtual wchar_t get_char(Color color) = 0;
-	virtual bool move_valid(int x, int y, const ChessGame& a_game) = 0;
+	virtual QPixmap* get_pxmap(Color color) = 0;
+	// virtual bool move_valid(int x, int y, const ChessGame& a_game) = 0;
 };
-
-struct King : public Piece
-{};
-
-// Turm 
-struct Rook : public Piece
-{};
-
-struct Bishop : public Piece
-{};
-
-struct Queen : public Piece
-{};
-
-struct Knight : public Piece
-{};
 
 struct Pawn : public Piece
 {
 	Pawn(int x, int y);
 
-	virtual wchar_t get_char(Color color) override;
-	virtual bool move_valid(int x, int y, const ChessGame& a_game) override;
+	virtual QPixmap* get_pxmap(Color color) override;
+	bool move_valid(int x, int y, const ChessGame& a_game);
+};
+
+// Turm 
+struct Rook : public Piece
+{
+	Rook(int x, int y)
+		: Piece(x, y)
+	{}
+
+	virtual QPixmap* get_pxmap(Color color) override;
+	bool move_valid(int x, int y, const ChessGame& a_game);
+};
+
+struct Knight : public Piece
+{
+	Knight(int x, int y)
+		: Piece(x, y)
+	{}
+
+	virtual QPixmap* get_pxmap(Color color) override;
+	bool move_valid(int x, int y, const ChessGame& a_game);
+};
+
+struct Bishop : public Piece
+{
+	Bishop(int x, int y)
+		: Piece(x, y)
+	{}
+
+	virtual QPixmap* get_pxmap(Color color) override;
+	bool move_valid(int x, int y, const ChessGame& a_game);
+};
+
+struct Queen : public Piece
+{
+	Queen(int x, int y)
+		: Piece(x, y)
+	{}
+
+	virtual QPixmap* get_pxmap(Color color) override;
+	bool move_valid(int x, int y, const ChessGame& a_game);
+};
+
+struct King : public Piece
+{
+	King(int x, int y)
+		: Piece(x, y)
+	{}
+
+	virtual QPixmap* get_pxmap(Color color) override;
+	bool move_valid(int x, int y, const ChessGame& a_game);
 };
 
 
