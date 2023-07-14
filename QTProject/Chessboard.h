@@ -1,6 +1,4 @@
-
-#ifndef CHESSBOARD_H
-#define CHESSBOARD_H
+#pragma once 
 
 #include "ChessGame.h"
 #include <iostream>
@@ -13,16 +11,18 @@
 #include <QDebug>
 #include <QFile>
 
+#include "ChessboardField.h"
 
 /*Drawing the playing-field here*/
 class Chessboard : public QGraphicsView
 {
+	Q_OBJECT
 private:
 	QApplication& m_application;
 	ChessGame m_chessgame;
-	std::vector<std::unique_ptr<QGraphicsRectItem>> m_rect_items;
+
+	std::vector<std::unique_ptr<ChessboardField>> m_rect_items;
 	std::vector<std::unique_ptr<QLabel>> m_labels;
-	std::vector<std::unique_ptr<QImage>> m_images;
 	
 	const wchar_t w = L'\u2659'
 		, b = L'\u265F';
@@ -38,8 +38,8 @@ public:
 public:
 	Chessboard(QApplication& a_application, QGraphicsScene* a_scene, QSize a_windowrect);
 	
-
-	void display_rect(int x, int y, const QRectF& a_rect);
+	ChessboardField* getFieldAt(int x, int y);
+	ChessboardField* display_field(int x, int y, const QRectF& a_rect);
 	void display_label(int x, int y, const QRectF& a_rect, QPixmap& a_pxmp);
 	void display();
 	void print();
@@ -47,5 +47,3 @@ public:
 	void resizeEvent(QResizeEvent* event) override;
 };
 
-
-#endif

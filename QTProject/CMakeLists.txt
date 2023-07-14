@@ -3,7 +3,12 @@
 #
 
 # Add source to this project's executable.
-add_executable (QTProject "main.cpp" "main.h" "ChessGame.cpp" "ChessGame.h" "Chessboard.cpp" "Chessboard.h" "Pieces.cpp" "Pieces.h")
+file(GLOB CPP . *.cpp)
+file(GLOB HPP . *.h)
+
+add_executable (QTProject ${HPP} ${CPP} "ChessboardField.h" "ChessboardField.cpp")
+
+set_target_properties(QTProject PROPERTIES AUTOMOC TRUE)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
 

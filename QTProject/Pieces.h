@@ -1,10 +1,11 @@
 
-#ifndef PIECES_H
-#define PIECES_H
+#pragma once 
 
 #include <iostream>
 #include <vector>
 #include <qwidget.h>
+#include <QLabel>
+#include <QDebug>
 
 class ChessGame;
 
@@ -105,5 +106,3 @@ struct King : public Piece
 };
 
 
-
-#endif

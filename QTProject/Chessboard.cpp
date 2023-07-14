@@ -29,14 +29,13 @@ Chessboard::Chessboard(QApplication& a_application, QGraphicsScene* a_scene, QSi
 	
 	this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	
+		
 	for (int i = 0; i < BOARD_WIDTH * BOARD_HEIGHT; ++i)
 	{
-		m_rect_items.push_back(std::make_unique<QGraphicsRectItem>());
-		m_labels.push_back(std::make_unique<QLabel>());
-		m_images.push_back(std::make_unique<QImage>());
+		m_rect_items.push_back(std::make_unique<ChessboardField>('A'+(i%BOARD_WIDTH), 1+i/BOARD_WIDTH, this));
+		m_labels.push_back(std::make_unique<QLabel>());				
 	}
-	for (std::unique_ptr<QGraphicsRectItem>& r : m_rect_items)
+	for (std::unique_ptr<ChessboardField>& r : m_rect_items)
 	{
 		scene()->addItem(r.get());
 	}
@@ -44,24 +43,29 @@ Chessboard::Chessboard(QApplication& a_application, QGraphicsScene* a_scene, QSi
 	for (std::unique_ptr<QLabel>& l : m_labels)
 	{
 		scene()->addWidget(l.get());
+		l->setVisible(false);
 	}
-	
+
 	Piece::glob_ChessPiecesBitmap = create_pixmaps(4, 3, QPixmap(m_filename));
 	// m_pxmaps = create_pixmaps(4, 3, QPixmap(m_filename));	
 }
 
 
-void Chessboard::display_rect(int x, int y, const QRectF& a_rect)
+ChessboardField* Chessboard::getFieldAt(int x, int y)
 {
-	
-	QGraphicsRectItem* rect_item = m_rect_items[y * BOARD_WIDTH + x].get();
+	return m_rect_items[y * BOARD_WIDTH + x].get();
+}
+
+ChessboardField* Chessboard::display_field(int x, int y, const QRectF& a_rect)
+{	
+	ChessboardField* rect_item = getFieldAt(x, y);
 
 	rect_item->setRect(a_rect);
 	if ((x + y) % 2)
 		rect_item->setBrush(QColor(238, 238, 228));
 	else
 		rect_item->setBrush(QColor(234, 182, 118));
-
+	return rect_item;
 }
 
 void Chessboard::display_label(int x, int y, const QRectF& a_rect, QPixmap& a_pxmp)
@@ -80,6 +84,8 @@ void Chessboard::display_label(int x, int y, const QRectF& a_rect, QPixmap& a_px
 
 	label_item->setGeometry(cpy);
 	label_item->setPixmap(a_pxmp.scaled(cpy.width(), cpy.height()));
+
+	getFieldAt(x, y)->setPixmap(a_pxmp.scaled(cpy.width(), cpy.height()));
 }
 
 void Chessboard::display()
@@ -96,15 +102,15 @@ void Chessboard::display()
 		{
 			rect = QRectF(x * xSegSize, y * ySegSize, xSegSize, ySegSize);
 
-			display_rect(x, y, rect);
+			QGraphicsItem* gRect = display_field(x, y, rect);
 			int counter = y * BOARD_WIDTH + x;
 			std::pair<Piece*, Color> p = m_chessgame.piece_at(x, y);
 
 			QPixmap* pxmp = p.first ? p.first->get_pxmap(p.second) : nullptr;
-			if(pxmp)
+			if (pxmp)
 				display_label(x, y, rect, *pxmp);
 		}
-	}	
+	}
 	show();
 }
 
