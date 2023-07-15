@@ -67,6 +67,8 @@ void ChessboardField::mousePressEvent(QGraphicsSceneMouseEvent* event)
 		m_draggedPiece->setPixmap(m_pixmap->scaled(boundingRect().size().toSize()));
 		m_draggedPiece->setZValue(1);
 		updateDraggedPos(event);
+
+		// TODO: Valide Zuege markieren
 	}
 }
 
