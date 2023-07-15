@@ -3,3 +3,4 @@
 **/CMakeFiles/**
 
 **.hint
+/enc_temp_folder/**

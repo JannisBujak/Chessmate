@@ -32,19 +32,12 @@ Chessboard::Chessboard(QApplication& a_application, QGraphicsScene* a_scene, QSi
 		
 	for (int i = 0; i < BOARD_WIDTH * BOARD_HEIGHT; ++i)
 	{
-		m_rect_items.push_back(std::make_unique<ChessboardField>('A'+(i%BOARD_WIDTH), 1+i/BOARD_WIDTH, this));
-		m_labels.push_back(std::make_unique<QLabel>());				
+		m_rect_items.push_back(std::make_unique<ChessboardField>('A'+(i%BOARD_WIDTH), 1+i/BOARD_WIDTH, this->scene()));		
 	}
 	for (std::unique_ptr<ChessboardField>& r : m_rect_items)
 	{
 		scene()->addItem(r.get());
-	}
-	
-	for (std::unique_ptr<QLabel>& l : m_labels)
-	{
-		scene()->addWidget(l.get());
-		l->setVisible(false);
-	}
+	}	
 
 	Piece::glob_ChessPiecesBitmap = create_pixmaps(4, 3, QPixmap(m_filename));
 	// m_pxmaps = create_pixmaps(4, 3, QPixmap(m_filename));	
@@ -53,7 +46,7 @@ Chessboard::Chessboard(QApplication& a_application, QGraphicsScene* a_scene, QSi
 
 ChessboardField* Chessboard::getFieldAt(int x, int y)
 {
-	return m_rect_items[y * BOARD_WIDTH + x].get();
+	return m_rect_items[y * BOARD_WIDTH + x].get();	
 }
 
 ChessboardField* Chessboard::display_field(int x, int y, const QRectF& a_rect)
@@ -70,8 +63,6 @@ ChessboardField* Chessboard::display_field(int x, int y, const QRectF& a_rect)
 
 void Chessboard::display_label(int x, int y, const QRectF& a_rect, QPixmap& a_pxmp)
 {	
-	QLabel* label_item = m_labels[y * BOARD_WIDTH + x].get();
-	
 	int wTenth = a_rect.width() / 10
 		, hTenth = a_rect.height() / 10;
 	QRect cpy(a_rect.left() + wTenth
@@ -80,11 +71,6 @@ void Chessboard::display_label(int x, int y, const QRectF& a_rect, QPixmap& a_px
 		, a_rect.height() - (2 * hTenth)
 	);
 	
-	label_item->setAttribute(Qt::WA_TranslucentBackground);
-
-	label_item->setGeometry(cpy);
-	label_item->setPixmap(a_pxmp.scaled(cpy.width(), cpy.height()));
-
 	getFieldAt(x, y)->setPixmap(a_pxmp.scaled(cpy.width(), cpy.height()));
 }
 

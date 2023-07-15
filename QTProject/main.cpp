@@ -24,8 +24,7 @@ int main(int argc, char** argv)
 	//app.setActiveWindow(&chessboard);
 
 	chessboard.display();
-
-
+	
 	app.exec();
 
 #else 

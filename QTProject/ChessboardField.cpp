@@ -4,15 +4,14 @@
 #include <QGraphicsSceneMouseEvent>
 #include <cmath>
 
-ChessboardField::ChessboardField(char a_column, char a_row, Chessboard* a_parentCB)
-	: m_parentCB(a_parentCB)
+ChessboardField::ChessboardField(char a_column, char a_row, QGraphicsScene* a_scene)
+	: m_scene(a_scene)
 	, m_column(a_column)
 	, m_row(a_row)
 	, m_pxmapItem(nullptr)
 {
 	qDebug() << "Created field" << getText();
-	static int ct = 0;
-
+	
 	setAcceptDrops(true); 
 }
 
@@ -24,30 +23,37 @@ QString ChessboardField::getText()
 void ChessboardField::setPixmap(QPixmap a_pxmp)
 {
 	m_pixmap = std::make_unique<QPixmap>(a_pxmp);
-	/*
-	m_pxmapItem = new QGraphicsPixmapItem(this);
-	m_pxmapItem->clearFocus();
-	m_pxmapItem->setPixmap(a_pxmp);
-	*/
+	update();
 }
 
 void ChessboardField::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
 	if (!m_draggedPiece && m_pixmap)
 	{
-		QRectF bounding = sceneBoundingRect();
-		
-		m_pxmapItem = std::make_unique<QGraphicsPixmapItem>(this);
+		QRectF bounding = sceneBoundingRect();		
+		if (!m_pxmapItem)
+		{
+			m_pxmapItem = std::make_unique< QGraphicsPixmapItem>();
+			m_scene->addItem(m_pxmapItem.get());
+		}
 		m_pxmapItem->setPixmap(m_pixmap->scaled(bounding.size().toSize()));
 		m_pxmapItem->setPos(bounding.topLeft());
 	}
 	QGraphicsRectItem::paint(painter, option, widget);
 }
 
-void ChessboardField::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
+void ChessboardField::updateDraggedPos(QGraphicsSceneMouseEvent* event)
 {
-	if(m_draggedPiece)
-		m_draggedPiece->setPos(event->scenePos());
+	if (m_draggedPiece)
+	{
+		QPointF size = m_draggedPiece->boundingRect().bottomRight() - m_draggedPiece->boundingRect().topLeft();
+		m_draggedPiece->setPos(event->scenePos() - size/2);
+	}
+}
+
+void ChessboardField::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
+{	
+	updateDraggedPos(event);
 }
 
 void ChessboardField::mousePressEvent(QGraphicsSceneMouseEvent* event)
@@ -55,13 +61,12 @@ void ChessboardField::mousePressEvent(QGraphicsSceneMouseEvent* event)
 	qDebug() << "Click" << getText();
 	if (m_pixmap)
 	{
-		// Set m_draggedPiece
-		m_pxmapItem.reset();
-		m_draggedPiece = std::make_unique<QGraphicsPixmapItem>(this);
+		// Set m_draggedPiece		
+		m_draggedPiece = std::make_unique<QGraphicsPixmapItem>();
+		m_scene->addItem(m_draggedPiece.get());
 		m_draggedPiece->setPixmap(m_pixmap->scaled(boundingRect().size().toSize()));
 		m_draggedPiece->setZValue(1);
-		m_draggedPiece->setPos(event->pos());
-
+		updateDraggedPos(event);
 	}
 }
 

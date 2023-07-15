@@ -22,7 +22,6 @@ private:
 	ChessGame m_chessgame;
 
 	std::vector<std::unique_ptr<ChessboardField>> m_rect_items;
-	std::vector<std::unique_ptr<QLabel>> m_labels;
 	
 	const wchar_t w = L'\u2659'
 		, b = L'\u265F';
