@@ -1,3 +1,4 @@
+
 #include "ChessboardField.h"
 
 #include "Chessboard.h"
@@ -51,6 +52,11 @@ void ChessboardField::updateDraggedPos(QGraphicsSceneMouseEvent* event)
 	}
 }
 
+QPointF ChessboardField::getBoardPos() const
+{
+	return QPointF(m_column, m_row);
+}
+
 void ChessboardField::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {	
 	updateDraggedPos(event);
@@ -76,6 +82,12 @@ void ChessboardField::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
 	auto [piece, color] = m_chessboard->Game().piece_at(m_column, m_row);
 	ChessboardField* field_drop = m_chessboard->getFieldAtScenePos(event->scenePos());
+	
+	QPointF drop_pos = field_drop->getBoardPos();
+	if (piece->move_valid(drop_pos.x(), drop_pos.y(), m_chessboard->Game()))
+	{
+
+	}
 
 	qDebug() << "From" << getText() << "to" << ((field_drop) ? field_drop->getText() : QString("(%1, %2)").arg(event->scenePos().x()).arg(event->scenePos().y()));
 	m_draggedPiece.reset();

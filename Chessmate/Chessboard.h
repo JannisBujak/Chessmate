@@ -28,7 +28,7 @@ private:
 
 	const QChar qw = QChar(0x59, 0x26);
 
-	const QString m_filename = QString("../../../../QTProject/chess-icon/vecteezy_chess_icon-removebg.png");
+	const QString m_filename = QString("../../../../Chessmate/chess-icon/vecteezy_chess_icon-removebg.png");
 	// const QString m_filename = QString(":/QTProject/chess-icon/vecteezy_chess_icon.jpg");
 		
 public:

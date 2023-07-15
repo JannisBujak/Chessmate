@@ -43,7 +43,7 @@ public:
 	}
 
 	virtual QPixmap* get_pxmap(Color color) = 0;
-	// virtual bool move_valid(int m_col, int m_row, const ChessGame& a_game) = 0;
+	virtual bool move_valid(int m_col, int m_row, const ChessGame& a_game) = 0;
 };
 
 struct Pawn : public Piece
@@ -51,7 +51,7 @@ struct Pawn : public Piece
 	Pawn(int a_col, int a_row);
 
 	virtual QPixmap* get_pxmap(Color color) override;
-	bool move_valid(int a_col, int a_row, const ChessGame& a_game);
+	bool move_valid(int a_col, int a_row, const ChessGame& a_game) override;
 };
 
 // Turm 
@@ -62,7 +62,7 @@ struct Rook : public Piece
 	{}
 
 	virtual QPixmap* get_pxmap(Color color) override;
-	bool move_valid(int a_col, int a_row, const ChessGame& a_game);
+	bool move_valid(int a_col, int a_row, const ChessGame& a_game) override;
 };
 
 struct Knight : public Piece
@@ -72,7 +72,7 @@ struct Knight : public Piece
 	{}
 
 	virtual QPixmap* get_pxmap(Color color) override;
-	bool move_valid(int a_col, int a_row, const ChessGame& a_game);
+	bool move_valid(int a_col, int a_row, const ChessGame& a_game) override;
 };
 
 struct Bishop : public Piece
@@ -82,7 +82,7 @@ struct Bishop : public Piece
 	{}
 
 	virtual QPixmap* get_pxmap(Color color) override;
-	bool move_valid(int a_col, int a_row, const ChessGame& a_game);
+	bool move_valid(int a_col, int a_row, const ChessGame& a_game) override;
 };
 
 struct Queen : public Piece
@@ -92,7 +92,7 @@ struct Queen : public Piece
 	{}
 
 	virtual QPixmap* get_pxmap(Color color) override;
-	bool move_valid(int a_col, int a_row, const ChessGame& a_game);
+	bool move_valid(int a_col, int a_row, const ChessGame& a_game) override;
 };
 
 struct King : public Piece
@@ -102,7 +102,7 @@ struct King : public Piece
 	{}
 
 	virtual QPixmap* get_pxmap(Color color) override;
-	bool move_valid(int a_col, int a_row, const ChessGame& a_game);
+	bool move_valid(int a_col, int a_row, const ChessGame& a_game) override;
 };
 
 

@@ -27,6 +27,8 @@ public:
 	void paint(QPainter* painter,
 		const QStyleOptionGraphicsItem* option, QWidget* widget);
 	void updateDraggedPos(QGraphicsSceneMouseEvent* event);
+	QPointF getBoardPos() const;
+
 protected:
 	void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
 	void mousePressEvent(QGraphicsSceneMouseEvent* event) override;

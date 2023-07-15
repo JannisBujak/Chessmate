@@ -46,6 +46,11 @@ QPixmap* Rook::get_pxmap(Color color)
 	return nullptr;
 }
 
+bool Rook::move_valid(int a_col, int a_row, const ChessGame& a_game)
+{
+	return false;
+}
+
 QPixmap* Knight::get_pxmap(Color color)
 {
 	switch (color)
@@ -56,6 +61,11 @@ QPixmap* Knight::get_pxmap(Color color)
 		return &glob_ChessPiecesBitmap[10];
 	};
 	return nullptr;
+}
+
+bool Knight::move_valid(int a_col, int a_row, const ChessGame& a_game)
+{
+	return false;
 }
 
 QPixmap* Bishop::get_pxmap(Color color)
@@ -70,6 +80,11 @@ QPixmap* Bishop::get_pxmap(Color color)
 	return nullptr;
 }
 
+bool Bishop::move_valid(int a_col, int a_row, const ChessGame& a_game)
+{
+	return false;
+}
+
 QPixmap* Queen::get_pxmap(Color color)
 {
 	switch (color)
@@ -82,6 +97,11 @@ QPixmap* Queen::get_pxmap(Color color)
 	return nullptr;
 }
 
+bool Queen::move_valid(int a_col, int a_row, const ChessGame& a_game)
+{
+	return false;
+}
+
 QPixmap* King::get_pxmap(Color color)
 {
 	switch (color)
@@ -92,4 +112,9 @@ QPixmap* King::get_pxmap(Color color)
 		return &glob_ChessPiecesBitmap[6];
 	};
 	return nullptr;
+}
+
+bool King::move_valid(int a_col, int a_row, const ChessGame& a_game)
+{
+	return false;
 }

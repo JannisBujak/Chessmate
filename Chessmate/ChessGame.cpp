@@ -27,9 +27,7 @@ void ChessGame::init()
 	};
 	fill_backrow(black, 0);
 	fill_backrow(white, 7);
-
-	
-
+		
 	// R K B Q K B K R
 
 }
