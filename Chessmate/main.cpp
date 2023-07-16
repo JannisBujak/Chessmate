@@ -17,11 +17,11 @@ int main(int argc, char** argv)
 	// Chess-stuff
 	
 	QGraphicsScene scene;
-	Chessboard chessboard(app, &scene, QSize(960, 540));
+	Chessboard chessgame(app, &scene, QSize(960, 540));
 
 	//app.setActiveWindow(&chessboard);
 
-	chessboard.display();
+	chessgame.display();
 	
 	app.exec();
 

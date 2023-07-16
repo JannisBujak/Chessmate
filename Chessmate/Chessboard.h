@@ -1,6 +1,5 @@
 #pragma once 
 
-#include "ChessGame.h"
 #include <iostream>
 #include <QGraphicsView>
 #include <QGraphicsRectItem>
@@ -12,6 +11,10 @@
 #include <QFile>
 
 #include "ChessboardField.h"
+#include "Pieces.h"
+
+#define BOARD_WIDTH 8
+#define BOARD_HEIGHT 8
 
 /*Drawing the playing-field here*/
 class Chessboard : public QGraphicsView
@@ -19,9 +22,9 @@ class Chessboard : public QGraphicsView
 	Q_OBJECT
 private:
 	QApplication& m_application;
-	ChessGame m_chessgame;
 
 	std::vector<std::unique_ptr<ChessboardField>> m_rect_items;
+	std::vector<std::shared_ptr<Piece>> white, black;
 	
 	const wchar_t w = L'\u2659'
 		, b = L'\u265F';
@@ -37,14 +40,19 @@ public:
 public:
 	Chessboard(QApplication& a_application, QGraphicsScene* a_scene, QSize a_windowrect);
 	
-	ChessboardField* getFieldAt(int x, int y);
-	ChessboardField* getFieldAtScenePos(QPointF a_scPos);
+	template <typename T>
+	void addPiece(std::vector<std::shared_ptr<Piece>>&vec, int a_col, int a_row)
+	{
+		vec.push_back(std::make_shared<T>(a_col, a_row));
+	};
+	void init();
+
+	ChessboardField* fieldAt(int x, int y);
+	ChessboardField* fieldAtScenePos(QPointF a_scPos);
 	ChessboardField* display_field(int x, int y, const QRectF& a_rect);
 	void display_label(int x, int y, const QRectF& a_rect, QPixmap& a_pxmp);
 	void display();
 	void print();
-
-	ChessGame& Game();
 
 	void resizeEvent(QResizeEvent* event) override;
 };

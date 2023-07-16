@@ -22,13 +22,13 @@ if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET Chessmate PROPERTY CXX_STANDARD 20)
 endif()
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 
 if(MSVC)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++20")
 else(MSVC)
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
 endif(MSVC) 
 
 

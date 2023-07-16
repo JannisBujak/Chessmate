@@ -80,8 +80,10 @@ void ChessboardField::mousePressEvent(QGraphicsSceneMouseEvent* event)
 
 void ChessboardField::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
+	// TODO: Komplett neu 
+	/*
 	auto [piece, color] = m_chessboard->Game().piece_at(m_column, m_row);
-	ChessboardField* field_drop = m_chessboard->getFieldAtScenePos(event->scenePos());
+	ChessboardField* field_drop = m_chessboard->fieldAtScenePos(event->scenePos());
 	
 	QPointF drop_pos = field_drop->getBoardPos();
 	if (piece->move_valid(drop_pos.x(), drop_pos.y(), m_chessboard->Game()))
@@ -91,5 +93,6 @@ void ChessboardField::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 
 	qDebug() << "From" << getText() << "to" << ((field_drop) ? field_drop->getText() : QString("(%1, %2)").arg(event->scenePos().x()).arg(event->scenePos().y()));
 	m_draggedPiece.reset();
+	*/
 }
 

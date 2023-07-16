@@ -1,7 +1,5 @@
 #include "Pieces.h"
 
-#include "ChessGame.h"
-
 std::vector<QPixmap> Piece::glob_ChessPiecesBitmap;
 
 Piece::Piece(int a_col, int a_row)

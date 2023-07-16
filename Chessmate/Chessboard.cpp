@@ -1,8 +1,6 @@
 #include "Chessboard.h"
 #include <qcolor.h>
 
-#include "Pieces.h"
-
 std::vector<QPixmap> Chessboard::create_pixmaps(int a_xSectors, int a_ySectors, const QPixmap& a_glob_pxmp)
 {
 	std::vector<QPixmap> pxmaps;
@@ -43,13 +41,44 @@ Chessboard::Chessboard(QApplication& a_application, QGraphicsScene* a_scene, QSi
 	// m_pxmaps = create_pixmaps(4, 3, QPixmap(m_filename));	
 }
 
+void Chessboard::init()
+{
+	/*auto addPiece = [&] <typename T> (std::vector<std::shared_ptr<Piece>>&vec, int a_col, int a_row)
+	{
+		vec.push_back(std::make_shared<T>(a_col, a_row));
+	};*/
 
-ChessboardField* Chessboard::getFieldAt(int x, int y)
+	for (int x = 0; x < BOARD_WIDTH; ++x)
+	{
+		addPiece <Pawn> (white, x, 6);
+		white.push_back(std::make_unique<Pawn>(x, 6));
+		black.push_back(std::make_unique<Pawn>(x, 1));
+	}
+	/*
+	auto fill_backrow = [](std::vector<std::unique_ptr<Piece>>& a_team, int col)
+	{
+		a_team.push_back(std::make_unique<Rook>(0, col));
+		a_team.push_back(std::make_unique<Knight>(1, col));
+		a_team.push_back(std::make_unique<Bishop>(2, col));
+		a_team.push_back(std::make_unique<Queen>(3, col));
+		a_team.push_back(std::make_unique<King>(4, col));
+		a_team.push_back(std::make_unique<Bishop>(5, col));
+		a_team.push_back(std::make_unique<Knight>(6, col));
+		a_team.push_back(std::make_unique<Rook>(7, col));
+	};
+	fill_backrow(black, 0);
+	fill_backrow(white, 7);*/
+
+	// R K B Q K B K R
+}
+
+
+ChessboardField* Chessboard::fieldAt(int x, int y)
 {
 	return m_rect_items[y * BOARD_WIDTH + x].get();	
 }
 
-ChessboardField* Chessboard::getFieldAtScenePos(QPointF a_scPos)
+ChessboardField* Chessboard::fieldAtScenePos(QPointF a_scPos)
 {
 	for(int i = 0; i < m_rect_items.size(); i++)
 	{
@@ -64,7 +93,7 @@ ChessboardField* Chessboard::getFieldAtScenePos(QPointF a_scPos)
 
 ChessboardField* Chessboard::display_field(int x, int y, const QRectF& a_rect)
 {	
-	ChessboardField* rect_item = getFieldAt(x, y);
+	ChessboardField* rect_item = fieldAt(x, y);
 
 	rect_item->setRect(a_rect);
 	if ((x + y) % 2)
@@ -84,7 +113,7 @@ void Chessboard::display_label(int x, int y, const QRectF& a_rect, QPixmap& a_px
 		, a_rect.height() - (2 * hTenth)
 	);
 	
-	getFieldAt(x, y)->setPixmap(a_pxmp.scaled(cpy.width(), cpy.height()));
+	fieldAt(x, y)->setPixmap(a_pxmp.scaled(cpy.width(), cpy.height()));
 }
 
 void Chessboard::display()
@@ -95,6 +124,9 @@ void Chessboard::display()
 		, ySegSize = height / BOARD_HEIGHT;	
 	
 	QRectF rect;
+
+	// TODO: Neu 
+	/*
 	for (int y = 0; y < BOARD_HEIGHT; y++)
 	{
 		for (int x = 0; x < BOARD_WIDTH; x++)
@@ -103,19 +135,15 @@ void Chessboard::display()
 
 			QGraphicsItem* gRect = display_field(x, y, rect);
 			int counter = y * BOARD_WIDTH + x;
+			
 			std::pair<Piece*, Color> p = m_chessgame.piece_at(x, y);
 
 			QPixmap* pxmp = p.first ? p.first->get_pxmap(p.second) : nullptr;
 			if (pxmp)
-				display_label(x, y, rect, *pxmp);
+				display_label(x, y, rect, *pxmp);			
 		}
-	}
+	}*/
 	show();
-}
-
-ChessGame& Chessboard::Game()
-{
-	return m_chessgame;
 }
 
 void Chessboard::resizeEvent(QResizeEvent* event)

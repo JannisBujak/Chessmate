@@ -22,8 +22,10 @@ public:
 
 private:
 	int m_col, m_row;
-public:
+	
+protected:
 	Piece(int a_col, int a_row);
+public:
 
 	bool same_pos(int a_col, int a_row)
 	{

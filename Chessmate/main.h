@@ -17,7 +17,6 @@
 #include <QGraphicsRectItem>
 
 #include "Chessboard.h"
-#include "ChessGame.h"
 // TODO: Reference additional headers your program requires here.
 
 
