@@ -6,6 +6,7 @@
 #include <QApplication>
 #include <QMainWindow>
 #include <QLabel>
+#include <vector>
 
 #include <QDebug>
 #include <QFile>
@@ -41,19 +42,25 @@ public:
 	Chessboard(QApplication& a_application, QGraphicsScene* a_scene, QSize a_windowrect);
 	
 	template <typename T>
-	void addPiece(std::vector<std::shared_ptr<Piece>>&vec, int a_col, int a_row)
-	{
-		vec.push_back(std::make_shared<T>(a_col, a_row));
-	};
+	void addPiece(Color a_color, int a_col, int a_row);
+	
+	void fillBackrow(Color a_color, int a_col);
 	void init();
 
 	ChessboardField* fieldAt(int x, int y);
 	ChessboardField* fieldAtScenePos(QPointF a_scPos);
 	ChessboardField* display_field(int x, int y, const QRectF& a_rect);
-	void display_label(int x, int y, const QRectF& a_rect, QPixmap& a_pxmp);
+	void display_label(int x, int y, const QRectF& a_rect, const QPixmap& a_pxmp);
 	void display();
 	void print();
 
 	void resizeEvent(QResizeEvent* event) override;
 };
 
+template<typename T>
+inline void Chessboard::addPiece(Color a_color, int a_col, int a_row)
+{
+	std::shared_ptr<T> piece = std::make_shared<T>(a_col, a_row, a_color);
+	((a_color == Color::White) ? white : black).push_back(piece);	
+	this->fieldAt(a_col, a_row)->setPiece(piece);
+}
