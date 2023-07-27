@@ -96,22 +96,24 @@ void ChessboardField::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 
 	ChessboardField* field_drop = m_chessboard->fieldAtScenePos(event->scenePos());
 	
-	QPointF drop_pos = field_drop->getBoardPos();
-	
-	qDebug() << "From" << getText() << "to" << ((field_drop) ? field_drop->getText() : QString("(%1, %2)").arg(event->scenePos().x()).arg(event->scenePos().y()));
-	if (field_drop != this)
+	if (field_drop && field_drop != this)
 	{
-		if (piece->move_valid(drop_pos.x(), drop_pos.y(), *m_chessboard))
+		QPointF drop_pos = field_drop->getBoardPos();
+		int selX = drop_pos.x(), selY = drop_pos.y();
+
+		qDebug() << "From" << getText() << "to" << ((field_drop) ? field_drop->getText() : QString("(%1, %2)").arg(event->scenePos().x()).arg(event->scenePos().y()));
+
+		if (piece->move_valid(selX, selY, *m_chessboard))
 		{
 			field_drop->setPiece(m_piece);
+			m_piece->updatePosition(selX, selY);
 			m_draggedPiece.reset();
 			m_pxmapItem.reset();
 			m_piece.reset();
+			return;
 		}
 	}
-	else {
-		// Invalid move 
-		m_draggedPiece.reset();
-	}
+	qDebug() << "Canceled";
+	m_draggedPiece.reset();
 }
 

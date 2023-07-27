@@ -47,7 +47,10 @@ public:
 	void fillBackrow(Color a_color, int a_col);
 	void init();
 
+	std::shared_ptr<Piece> pieceAt(int x, int y) const; 
+
 	ChessboardField* fieldAt(int x, int y);
+
 	ChessboardField* fieldAtScenePos(QPointF a_scPos);
 	ChessboardField* display_field(int x, int y, const QRectF& a_rect);
 	void display_label(int x, int y, const QRectF& a_rect, const QPixmap& a_pxmp);

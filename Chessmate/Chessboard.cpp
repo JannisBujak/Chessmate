@@ -68,6 +68,26 @@ void Chessboard::init()
 	// R K B Q K B K R
 }
 
+std::shared_ptr<Piece> Chessboard::pieceAt(int x, int y) const
+{
+	for (std::shared_ptr<Piece> w : white)
+	{
+		if (w->same_pos(x, y))
+		{
+			return w;
+		}
+	}
+
+	for (std::shared_ptr<Piece> b : black)
+	{
+		if (b->same_pos(x, y))
+		{
+			return b;
+		}
+	}
+	return std::shared_ptr<Piece>();
+}
+
 ChessboardField* Chessboard::fieldAt(int x, int y)
 {
 	return m_rect_items[y * BOARD_WIDTH + x].get();	
