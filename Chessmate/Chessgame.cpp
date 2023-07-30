@@ -23,6 +23,7 @@ Chessgame::Chessgame(QApplication& a_application, QGraphicsScene* a_scene, QSize
 	: m_application(a_application)
 	, QGraphicsView(a_scene)
 	, m_playingColor(Color::White)
+	, m_infoButton(std::make_shared<QGraphicsTextItem>())
 {
 	resize(a_windowrect.width(), a_windowrect.height());
 	
@@ -147,7 +148,9 @@ void Chessgame::display()
 	
 	QRectF rect;
 
-	// TODO: Neu 
+	// m_infoButton->setRect(0, 0, 200, 200);
+	m_infoButton->setPlainText(QString("%1 to move").arg((m_playingColor == Color::White) ? QString("White") : QString("Black")));
+	
 	for (int y = 0; y < BOARD_HEIGHT; y++)
 	{
 		for (int x = 0; x < BOARD_WIDTH; x++)
@@ -156,12 +159,6 @@ void Chessgame::display()
 
 			QGraphicsItem* gRect = display_field(x, y, rect);
 			int counter = y * BOARD_WIDTH + x;
-			
-			/*
-			QPixmap* pxmp = p.first ? p.first->get_pxmap(p.second) : nullptr;
-			if (pxmp)
-				display_label(x, y, rect, *pxmp);
-				*/
 		}
 	}
 	show();

@@ -29,6 +29,7 @@ private:
 
 	Color m_playingColor;
 
+	std::shared_ptr<QGraphicsTextItem> m_infoButton;
 	std::vector<std::shared_ptr<ChessboardField>> m_fields;
 	std::vector<std::shared_ptr<Piece>> white, black;
 	
