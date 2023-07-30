@@ -1,7 +1,7 @@
-#include "Chessboard.h"
+#include "Chessgame.h"
 #include <qcolor.h>
 
-std::vector<QPixmap> Chessboard::create_pixmaps(int a_xSectors, int a_ySectors, const QPixmap& a_glob_pxmp)
+std::vector<QPixmap> Chessgame::create_pixmaps(int a_xSectors, int a_ySectors, const QPixmap& a_glob_pxmp)
 {
 	std::vector<QPixmap> pxmaps;
 	int xSectorSize = a_glob_pxmp.width() / a_xSectors
@@ -19,9 +19,10 @@ std::vector<QPixmap> Chessboard::create_pixmaps(int a_xSectors, int a_ySectors, 
 	return pxmaps;
 }
 
-Chessboard::Chessboard(QApplication& a_application, QGraphicsScene* a_scene, QSize a_windowrect)
+Chessgame::Chessgame(QApplication& a_application, QGraphicsScene* a_scene, QSize a_windowrect)
 	: m_application(a_application)
 	, QGraphicsView(a_scene)
+	, m_playingColor(Color::White)
 {
 	resize(a_windowrect.width(), a_windowrect.height());
 	
@@ -30,9 +31,9 @@ Chessboard::Chessboard(QApplication& a_application, QGraphicsScene* a_scene, QSi
 		
 	for (int i = 0; i < BOARD_WIDTH * BOARD_HEIGHT; ++i)
 	{
-		m_rect_items.push_back(std::make_unique<ChessboardField>(i%BOARD_WIDTH, i/BOARD_WIDTH, this));		
+		m_fields.push_back(std::make_shared<ChessboardField>(i%BOARD_WIDTH, i/BOARD_WIDTH, this));		
 	}
-	for (std::unique_ptr<ChessboardField>& r : m_rect_items)
+	for (std::shared_ptr<ChessboardField>& r : m_fields)
 	{
 		scene()->addItem(r.get());
 	}	
@@ -42,7 +43,7 @@ Chessboard::Chessboard(QApplication& a_application, QGraphicsScene* a_scene, QSi
 	init();
 }
 
-void Chessboard::fillBackrow(Color a_color, int a_col)
+void Chessgame::fillBackrow(Color a_color, int a_col)
 {	
 	addPiece	<Rook>		(a_color, 0, a_col);
 	addPiece	<Knight>	(a_color, 1, a_col);
@@ -54,7 +55,7 @@ void Chessboard::fillBackrow(Color a_color, int a_col)
 	addPiece	<Rook>		(a_color, 7, a_col);	
 }
 
-void Chessboard::init()
+void Chessgame::init()
 {
 	for (int x = 0; x < BOARD_WIDTH; ++x)
 	{
@@ -68,7 +69,7 @@ void Chessboard::init()
 	// R K B Q K B K R
 }
 
-std::shared_ptr<Piece> Chessboard::pieceAt(int x, int y) const
+std::shared_ptr<Piece> Chessgame::pieceAt(int x, int y) const
 {
 	for (std::shared_ptr<Piece> w : white)
 	{
@@ -88,43 +89,43 @@ std::shared_ptr<Piece> Chessboard::pieceAt(int x, int y) const
 	return std::shared_ptr<Piece>();
 }
 
-ChessboardField* Chessboard::fieldAt(int x, int y)
+ChessboardField* Chessgame::fieldAt(int x, int y)
 {
-	return m_rect_items[y * BOARD_WIDTH + x].get();	
+	return m_fields[y * BOARD_WIDTH + x].get();	
 }
 
-ChessboardField* Chessboard::fieldAtScenePos(QPointF a_scPos)
+ChessboardField* Chessgame::fieldAtScenePos(QPointF a_scPos)
 {
-	for(int i = 0; i < m_rect_items.size(); i++)
+	for(int i = 0; i < m_fields.size(); i++)
 	{
-		if(m_rect_items[i]->sceneBoundingRect().contains(a_scPos))
+		if(m_fields[i]->sceneBoundingRect().contains(a_scPos))
 		{
-			return m_rect_items[i].get();
+			return m_fields[i].get();
 		}
 	}
 	return nullptr;
 }
 
-ChessboardField* Chessboard::display_field(int x, int y, const QRectF& a_rect)
+ChessboardField* Chessgame::display_field(int x, int y, const QRectF& a_rect)
 {	
-	ChessboardField* rect_item = fieldAt(x, y);
+	ChessboardField* field = fieldAt(x, y);
 
-	rect_item->setRect(a_rect);
+	field->setRect(a_rect);
 	if ((x + y) % 2)
-		rect_item->setBrush(QColor(238, 238, 228));
+		field->setBrush(QColor(238, 238, 228));
 	else
-		rect_item->setBrush(QColor(234, 182, 118));
+		field->setBrush(QColor(234, 182, 118));
 		
 	std::shared_ptr<Piece> piece;
-	if (piece = rect_item->getPiece())
+	if (piece = field->getPiece())
 	{
 		display_label(x, y, a_rect, piece->get_pxmap());
 	}
 	
-	return rect_item;
+	return field;
 }
 
-void Chessboard::display_label(int x, int y, const QRectF& a_rect, const QPixmap& a_pxmp)
+void Chessgame::display_label(int x, int y, const QRectF& a_rect, const QPixmap& a_pxmp)
 {	
 	int wTenth = a_rect.width() / 10
 		, hTenth = a_rect.height() / 10;
@@ -137,7 +138,7 @@ void Chessboard::display_label(int x, int y, const QRectF& a_rect, const QPixmap
 	// fieldAt(x, y)->setPixmap(a_pxmp.scaled(cpy.width(), cpy.height()));
 }
 
-void Chessboard::display()
+void Chessgame::display()
 {	
 	const size_t width = size().width()
 		, height = size().height()
@@ -166,7 +167,52 @@ void Chessboard::display()
 	show();
 }
 
-void Chessboard::resizeEvent(QResizeEvent* event)
+void Chessgame::markLegalMoves(std::shared_ptr<Piece> a_piece)
+{
+	for (std::shared_ptr<ChessboardField> field : m_fields)
+	{
+		auto [fieldX, fieldY] = field->getBoardPos();
+		if(a_piece->move_valid(fieldX, fieldY, *this))
+		{
+			field->setMarkLegal(true);
+		}
+	}
+	qDebug() << " ";
+}
+
+void Chessgame::markNoMoves(std::shared_ptr<Piece> a_piece)
+{
+	for (std::shared_ptr<ChessboardField> field : m_fields)
+	{
+		field->setMarkLegal(false);		
+	}
+}
+
+bool Chessgame::isMoveable(std::shared_ptr<Piece> a_piece)
+{
+	auto pc = a_piece->getColor();
+	return m_playingColor == pc;
+}
+
+void Chessgame::confirmMove()
+{
+	// Toggles playing color
+	m_playingColor = (m_playingColor == Color::White) ? Color::Black : Color::White;
+}
+
+void Chessgame::cleanPiece(std::shared_ptr<Piece> a_piece)
+{
+	if (a_piece->getColor() == Color::White)
+	{
+		deleteElementFromList(a_piece, white);
+	}
+	else 
+	{
+		deleteElementFromList(a_piece, black);
+	}
+}
+
+void Chessgame::resizeEvent(QResizeEvent* event)
 {
 	display();
 	QGraphicsView::resizeEvent(event);

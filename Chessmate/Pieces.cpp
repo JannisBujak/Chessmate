@@ -1,6 +1,6 @@
 #include "Pieces.h"
 
-#include "Chessboard.h"
+#include "Chessgame.h"
 
 std::vector<QPixmap> Piece::glob_ChessPiecesBitmap;
 
@@ -22,7 +22,7 @@ QPixmap& Pawn::get_pxmap()
 	};	
 }
 
-bool Pawn::piece_moveable(int a_col, int a_row, const Chessboard& a_board) const
+bool Pawn::piece_moveable(int a_col, int a_row, const Chessgame& a_board) const
 {
 	int yMov = (m_color == Color::Black) ? 1 : -1;
 	// Move up
@@ -41,6 +41,11 @@ bool Pawn::piece_moveable(int a_col, int a_row, const Chessboard& a_board) const
 	return false;
 }
 
+Color Piece::getColor()
+{
+	return m_color;
+}
+
 bool Piece::same_pos(int a_col, int a_row)
 {
 	return this->m_col == a_col && this->m_row == a_row;
@@ -56,7 +61,7 @@ bool Piece::same_row_or_column(int a_col, int a_row) const
 	return this->m_col == a_col || this->m_row == a_row;
 }
 
-bool Piece::pieces_blocking(int a_col, int a_row, const Chessboard& a_board) const
+bool Piece::pieces_blocking(int a_col, int a_row, const Chessgame& a_board) const
 {
 	// Bei Bewegung auf Diagonalen/Reihe/Spalte überprüfen, ob was im Weg ist 
 	if (same_diagonale(a_col, a_row) || same_row_or_column(a_col, a_row))
@@ -89,7 +94,7 @@ bool Piece::pieces_blocking(int a_col, int a_row, const Chessboard& a_board) con
 	return false;
 }
 
-bool Piece::abandons_king(int a_col, int a_row, const Chessboard& a_board) const
+bool Piece::abandons_king(int a_col, int a_row, const Chessgame& a_board) const
 {
 	return false;
 }
@@ -100,7 +105,7 @@ void Piece::updatePosition(int a_col, int a_row)
 	this->m_row = a_row;
 }
 
-bool Piece::move_valid(int a_col, int a_row, const Chessboard& a_board)
+bool Piece::move_valid(int a_col, int a_row, const Chessgame& a_board)
 {
 	bool a, b, c, d;
 	a = !same_pos(a_col, a_row);
@@ -138,7 +143,7 @@ QPixmap& Rook::get_pxmap()
 	};
 }
 
-bool Rook::piece_moveable(int a_col, int a_row, const Chessboard& a_board) const
+bool Rook::piece_moveable(int a_col, int a_row, const Chessgame& a_board) const
 {
 	return same_row_or_column(a_col, a_row);
 }
@@ -160,7 +165,7 @@ QPixmap& Knight::get_pxmap()
 	};
 }
 
-bool Knight::piece_moveable(int a_col, int a_row, const Chessboard& a_board) const
+bool Knight::piece_moveable(int a_col, int a_row, const Chessgame& a_board) const
 {
 	int XMov = abs(a_col - m_col)
 		, yMov = abs(a_row - m_row);
@@ -185,7 +190,7 @@ QPixmap& Bishop::get_pxmap()
 	};
 }
 
-bool Bishop::piece_moveable(int a_col, int a_row, const Chessboard& a_board) const
+bool Bishop::piece_moveable(int a_col, int a_row, const Chessgame& a_board) const
 {
 	return same_diagonale(a_col, a_row);
 }
@@ -206,7 +211,7 @@ QPixmap& Queen::get_pxmap()
 	};
 }
 
-bool Queen::piece_moveable(int a_col, int a_row, const Chessboard& a_board) const
+bool Queen::piece_moveable(int a_col, int a_row, const Chessgame& a_board) const
 {
 	return same_row_or_column(a_col, a_row) || same_diagonale(a_col, a_row);
 }
@@ -227,7 +232,7 @@ QPixmap& King::get_pxmap()
 	};
 }
 
-bool King::piece_moveable(int a_col, int a_row, const Chessboard& a_board) const
+bool King::piece_moveable(int a_col, int a_row, const Chessgame& a_board) const
 {
 	return (abs(a_col - m_col) <= 1) && (abs(a_row - m_row) <= 1);
 }

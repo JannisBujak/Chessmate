@@ -16,7 +16,9 @@
 #include <QGraphicsView>
 #include <QGraphicsRectItem>
 
-#include "Chessboard.h"
+#include <QBoxLayout>
+
+#include "Chessgame.h"
 // TODO: Reference additional headers your program requires here.
 
 

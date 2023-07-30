@@ -7,7 +7,7 @@
 #include <QLabel>
 #include <QDebug>
 
-class Chessboard;
+class Chessgame;
 
 enum class Color
 {
@@ -30,19 +30,21 @@ public:
 	virtual QPixmap& get_pxmap() = 0;
 
 protected:
-	virtual bool piece_moveable(int a_col, int a_row, const Chessboard& a_board) const = 0;
+	virtual bool piece_moveable(int a_col, int a_row, const Chessgame& a_board) const = 0;
 
 public:
+	Color getColor();
+
 	bool same_pos(int a_col, int a_row);
 
 	bool same_diagonale(int a_col, int a_row) const;
 	bool same_row_or_column(int a_col, int a_row) const;
 
-	bool pieces_blocking(int a_col, int a_row, const Chessboard& a_board) const;
-	bool abandons_king(int a_col, int a_row, const Chessboard& a_board) const;
+	bool pieces_blocking(int a_col, int a_row, const Chessgame& a_board) const;
+	bool abandons_king(int a_col, int a_row, const Chessgame& a_board) const;
 
 	void updatePosition(int a_col, int a_row);
-	bool move_valid(int a_col, int a_row, const Chessboard& a_board);
+	bool move_valid(int a_col, int a_row, const Chessgame& a_board);
 };
 
 struct Pawn : public Piece
@@ -51,7 +53,7 @@ struct Pawn : public Piece
 	Pawn(int a_col, int a_row, Color a_color);
 	
 	virtual QPixmap& get_pxmap() override;
-	bool piece_moveable(int a_col, int a_row, const Chessboard& a_board) const override;
+	bool piece_moveable(int a_col, int a_row, const Chessgame& a_board) const override;
 };
 
 // Turm 
@@ -60,7 +62,7 @@ struct Rook : public Piece
 	Rook(int a_col, int a_row, Color a_color);
 	
 	virtual QPixmap& get_pxmap() override;
-	bool piece_moveable(int a_col, int a_row, const Chessboard& a_board) const override;
+	bool piece_moveable(int a_col, int a_row, const Chessgame& a_board) const override;
 };
 
 struct Knight : public Piece
@@ -68,7 +70,7 @@ struct Knight : public Piece
 	Knight(int a_col, int a_row, Color a_color);
 	
 	virtual QPixmap& get_pxmap() override;
-	bool piece_moveable(int a_col, int a_row, const Chessboard& a_board) const override;
+	bool piece_moveable(int a_col, int a_row, const Chessgame& a_board) const override;
 };
 
 struct Bishop : public Piece
@@ -76,7 +78,7 @@ struct Bishop : public Piece
 	Bishop(int a_col, int a_row, Color a_color);
 
 	virtual QPixmap& get_pxmap() override;
-	bool piece_moveable(int a_col, int a_row, const Chessboard& a_board) const override;
+	bool piece_moveable(int a_col, int a_row, const Chessgame& a_board) const override;
 };
 
 struct Queen : public Piece
@@ -84,7 +86,7 @@ struct Queen : public Piece
 	Queen(int a_col, int a_row, Color a_color);
 
 	virtual QPixmap& get_pxmap() override;
-	bool piece_moveable(int a_col, int a_row, const Chessboard& a_board) const override;
+	bool piece_moveable(int a_col, int a_row, const Chessgame& a_board) const override;
 };
 
 struct King : public Piece
@@ -92,7 +94,7 @@ struct King : public Piece
 	King(int a_col, int a_row, Color a_color);
 
 	virtual QPixmap& get_pxmap() override;
-	bool piece_moveable(int a_col, int a_row, const Chessboard& a_board) const override;
+	bool piece_moveable(int a_col, int a_row, const Chessgame& a_board) const override;
 };
 
 

@@ -1,12 +1,12 @@
 
 #include "ChessboardField.h"
 
-#include "Chessboard.h"
+#include "Chessgame.h"
 #include <QGraphicsSceneMouseEvent>
 #include <cmath>
 
-ChessboardField::ChessboardField(char a_column, char a_row, Chessboard* a_chessboard)
-	: m_chessboard(a_chessboard)
+ChessboardField::ChessboardField(char a_column, char a_row, Chessgame* a_chessgame)
+	: m_chessgame(a_chessgame)
 	, m_column(a_column)
 	, m_row(a_row)
 	, m_pxmapItem(nullptr)
@@ -45,16 +45,43 @@ std::shared_ptr<Piece> ChessboardField::getPiece()
 	return m_piece;
 }
 
+void ChessboardField::setMarkLegal(bool a_marked)
+{
+	if (a_marked)
+	{
+		QPointF size = boundingRect().bottomRight() - boundingRect().topLeft();
+		QPointF point = pos() ;
+		m_legalMarker = std::make_unique<QGraphicsEllipseItem>(point.x(), point.y(), size.x(), size.y());
+		m_legalMarker->setBrush(QColor(50, 200, 50));
+		QRectF bounding = sceneBoundingRect();
+		m_legalMarker->setPos(bounding.topLeft());
+		qDebug() << point;
+		// m_legalMarker->setPos(point);
+	}
+	else {
+		m_legalMarker.reset();
+	}
+}
+
+void ChessboardField::cleanPiece()
+{
+	if (m_piece)
+	{
+		m_chessgame->cleanPiece(m_piece);
+	}
+
+}
+
 void ChessboardField::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {	
 	if (!m_draggedPiece && m_piece)
 	{
 		QPixmap pixmap = m_piece->get_pxmap();
-		QRectF bounding = sceneBoundingRect();		
+		QRectF bounding = sceneBoundingRect();
 		if (!m_pxmapItem)
 		{
 			m_pxmapItem = std::make_unique< QGraphicsPixmapItem>();
-			m_chessboard->scene()->addItem(m_pxmapItem.get());
+			m_chessgame->scene()->addItem(m_pxmapItem.get());
 		}
 		m_pxmapItem->setPixmap(pixmap.scaled(bounding.size().toSize()));
 		m_pxmapItem->setPos(bounding.topLeft());
@@ -71,31 +98,31 @@ void ChessboardField::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
 	qDebug() << "Click" << getText();
 	
-	if (m_piece)
+	if (m_piece && m_chessgame->isMoveable(m_piece))
 	{
 		QPixmap pixmap = m_piece->get_pxmap();
 		// Set m_draggedPiece		
 		m_draggedPiece = std::make_unique<QGraphicsPixmapItem>();
 		m_pxmapItem.reset();
-		m_chessboard->scene()->addItem(m_draggedPiece.get());
+		m_chessgame->scene()->addItem(m_draggedPiece.get());
 		m_draggedPiece->setPixmap(pixmap.scaled(boundingRect().size().toSize()));
 		m_draggedPiece->setZValue(1);
 		updateDraggedPos(event);
+		m_chessgame->markLegalMoves(m_piece);
 
 		// TODO: Valide Zuege markieren
 	}
+	else 
+		m_draggedPiece.reset();
 }
 
 void ChessboardField::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
-{
-	// TODO: Komplett neu 
-
-	auto piece = this->m_piece;
-	if (!piece)
+{	
+	ChessboardField* field_drop = m_chessgame->fieldAtScenePos(event->scenePos());
+	
+	if (!m_piece || !m_chessgame->isMoveable(m_piece))
 		return;
 
-	ChessboardField* field_drop = m_chessboard->fieldAtScenePos(event->scenePos());
-	
 	if (field_drop && field_drop != this)
 	{
 		QPointF drop_pos = field_drop->getBoardPos();
@@ -103,13 +130,15 @@ void ChessboardField::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 
 		qDebug() << "From" << getText() << "to" << ((field_drop) ? field_drop->getText() : QString("(%1, %2)").arg(event->scenePos().x()).arg(event->scenePos().y()));
 
-		if (piece->move_valid(selX, selY, *m_chessboard))
-		{
+		if (m_piece->move_valid(selX, selY, *m_chessgame))
+		{	
+			field_drop->cleanPiece();
 			field_drop->setPiece(m_piece);
 			m_piece->updatePosition(selX, selY);
 			m_draggedPiece.reset();
 			m_pxmapItem.reset();
 			m_piece.reset();
+			m_chessgame->confirmMove();
 			return;
 		}
 	}
