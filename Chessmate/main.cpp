@@ -2,6 +2,9 @@
 //
 
 #include "main.h"
+
+#include "qgraphicslinearlayout.h"
+
 #define USE_UI true
 
 using namespace std;
@@ -17,9 +20,19 @@ int main(int argc, char** argv)
 	// Chess-stuff
 	
 	QGraphicsScene scene;
-	Chessgame chessgame(app, &scene, QSize(960, 540));
+	QGraphicsView view;	
 
-	chessgame.display();
+	QGraphicsLinearLayout *windowLayout = new QGraphicsLinearLayout(Qt::Vertical);
+	QVBoxLayout layout;
+	
+	Chessboard* chessgame = new Chessboard(app, &scene, QSize(960, 540));
+
+	windowLayout->addItem(chessgame);
+
+	view.setLayout(windowLayout);
+	view.display();
+	
+	// chessgame->display();
 	
 	QVBoxLayout layout;
 	app.exec();
