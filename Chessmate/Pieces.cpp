@@ -58,7 +58,7 @@ bool Piece::same_row_or_column(int a_col, int a_row) const
 
 bool Piece::pieces_blocking(int a_col, int a_row, const Chessboard& a_board) const
 {
-	// Bei Bewegung auf Diagonalen/Reihe/Spalte überprüfen, ob was im Weg ist 
+	// Bei Bewegung auf Diagonalen/Reihe/Spalte ï¿½berprï¿½fen, ob was im Weg ist 
 	if (same_diagonale(a_col, a_row) || same_row_or_column(a_col, a_row))
 	{
 		int xMov = (a_col > m_col) ? 1 : ((a_col < m_col) ? -1 : 0)
@@ -75,7 +75,7 @@ bool Piece::pieces_blocking(int a_col, int a_row, const Chessboard& a_board) con
 		}
 	}
 
-	// Nur beim Springer möglich und der kann immer 
+	// Nur beim Springer mï¿½glich und der kann immer 
 	std::shared_ptr<Piece> piece;
 	if (piece = a_board.pieceAt(a_col, a_row))
 	{
@@ -181,6 +181,7 @@ QPixmap& Bishop::get_pxmap()
 	case  Color::White:
 		return glob_ChessPiecesBitmap[3];
 	case  Color::Black:
+	default:
 		return glob_ChessPiecesBitmap[9];
 	};
 }
@@ -202,6 +203,7 @@ QPixmap& Queen::get_pxmap()
 	case  Color::White:
 		return glob_ChessPiecesBitmap[1];
 	case  Color::Black:
+	default:
 		return glob_ChessPiecesBitmap[7];
 	};
 }
@@ -223,6 +225,7 @@ QPixmap& King::get_pxmap()
 	case  Color::White:
 		return glob_ChessPiecesBitmap[0];
 	case  Color::Black:
+	default:
 		return glob_ChessPiecesBitmap[6];
 	};
 }
