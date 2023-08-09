@@ -22,18 +22,18 @@ int main(int argc, char** argv)
 
 	QGraphicsLinearLayout* windowLayout = new QGraphicsLinearLayout(Qt::Vertical);
 	
-	// Chessgame chessgame(app, &scene, QSize(960, 540));
+	Chessgame chessgame(app, &scene, QSize(960, 540));
 	
 	QGraphicsLinearLayout* innerLayout = new QGraphicsLinearLayout(Qt::Vertical, windowLayout);
 	QGraphicsSimpleTextItem text("Henlo");
 
 	windowLayout->addItem(innerLayout);
-	//windowLayout->addItem(&chessgame);
+	windowLayout->addItem(&chessgame);
 
 	// scene.addWidget(widget);
 	// view.setLayout(windowLayout);
 	
-	// chessgame.display();
+	chessgame.display();
 	
 	app.exec();
 
