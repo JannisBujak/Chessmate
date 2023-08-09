@@ -1,13 +1,14 @@
 #pragma once 
 
 #include <iostream>
+#include <qgraphicsscene>
 #include <QGraphicsView>
-#include <QGraphicsLayoutItem>
 #include <QGraphicsRectItem>
 #include <QApplication>
 #include <QMainWindow>
 #include <QLabel>
 #include <vector>
+#include <QGraphicsLayoutItem>
 
 #include <QBoxLayout>
 
@@ -21,7 +22,7 @@
 #define BOARD_HEIGHT 8
 
 /*Drawing the playing-field here*/
-class Chessboard : public QGraphicsView, public QGraphicsLayoutItem
+class Chessgame : public QGraphicsView, public QGraphicsLayoutItem
 {
 	Q_OBJECT
 private:
@@ -77,7 +78,7 @@ public:
 
 	void resizeEvent(QResizeEvent* event) override;
 
-	virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const override{return QSizeF();}
+	virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF& constraint = QSizeF()) const override;
 };
 
 template<typename T>

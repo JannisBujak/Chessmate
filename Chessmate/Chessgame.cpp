@@ -215,3 +215,8 @@ void Chessgame::resizeEvent(QResizeEvent* event)
 	QGraphicsView::resizeEvent(event);
 }
 
+QSizeF Chessgame::sizeHint(Qt::SizeHint which, const QSizeF& constraint) const
+{
+	return QSizeF();
+}
+

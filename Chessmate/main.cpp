@@ -3,7 +3,6 @@
 
 #include "main.h"
 
-#include "qgraphicslinearlayout.h"
 
 #define USE_UI true
 
@@ -20,21 +19,22 @@ int main(int argc, char** argv)
 	// Chess-stuff
 	
 	QGraphicsScene scene;
-	QGraphicsView view;	
 
-	QGraphicsLinearLayout *windowLayout = new QGraphicsLinearLayout(Qt::Vertical);
-	QVBoxLayout layout;
+	QGraphicsLinearLayout* windowLayout = new QGraphicsLinearLayout(Qt::Vertical);
 	
-	Chessboard* chessgame = new Chessboard(app, &scene, QSize(960, 540));
+	// Chessgame chessgame(app, &scene, QSize(960, 540));
+	
+	QGraphicsLinearLayout* innerLayout = new QGraphicsLinearLayout(Qt::Vertical, windowLayout);
+	QGraphicsSimpleTextItem text("Henlo");
 
-	windowLayout->addItem(chessgame);
+	windowLayout->addItem(innerLayout);
+	//windowLayout->addItem(&chessgame);
 
-	view.setLayout(windowLayout);
-	view.display();
+	// scene.addWidget(widget);
+	// view.setLayout(windowLayout);
 	
-	// chessgame->display();
+	// chessgame.display();
 	
-	QVBoxLayout layout;
 	app.exec();
 
 #else 
