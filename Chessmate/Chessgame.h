@@ -26,9 +26,6 @@ class Chessgame : public QGraphicsView, public QGraphicsLayoutItem
 {
 	Q_OBJECT
 private:
-
-	QApplication& m_application;
-
 	Color m_playingColor;
 
 	std::shared_ptr<QGraphicsTextItem> m_infoButton;
@@ -47,7 +44,7 @@ public:
 	static std::vector<QPixmap> create_pixmaps(int a_xSectors, int a_ySectors, const QPixmap& a_glob_pxmp);
 
 public:
-	Chessgame(QApplication& a_application, QGraphicsScene* a_scene, QSize a_windowrect);
+	Chessgame(QGraphicsScene* a_scene);
 	
 	template <typename T>
 	void addPiece(Color a_color, int a_col, int a_row);

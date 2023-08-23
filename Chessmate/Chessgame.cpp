@@ -19,14 +19,11 @@ std::vector<QPixmap> Chessgame::create_pixmaps(int a_xSectors, int a_ySectors, c
 	return pxmaps;
 }
 
-Chessgame::Chessgame(QApplication& a_application, QGraphicsScene* a_scene, QSize a_windowrect)
-	: m_application(a_application)
-	, QGraphicsView(a_scene)
+Chessgame::Chessgame(QGraphicsScene* a_scene)
+	: QGraphicsView(a_scene)
 	, m_playingColor(Color::White)
 	, m_infoButton(std::make_shared<QGraphicsTextItem>())
-{
-	resize(a_windowrect.width(), a_windowrect.height());
-	
+{	
 	this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 		
