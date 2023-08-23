@@ -146,7 +146,6 @@ void Chessboard::display()
 	
 	QRectF rect;
 
-	// TODO: Neu 
 	for (int y = 0; y < BOARD_HEIGHT; y++)
 	{
 		for (int x = 0; x < BOARD_WIDTH; x++)
@@ -154,13 +153,6 @@ void Chessboard::display()
 			rect = QRectF(x * xSegSize, y * ySegSize, xSegSize, ySegSize);
 
 			QGraphicsItem* gRect = display_field(x, y, rect);
-			int counter = y * BOARD_WIDTH + x;
-			
-			/*
-			QPixmap* pxmp = p.first ? p.first->get_pxmap(p.second) : nullptr;
-			if (pxmp)
-				display_label(x, y, rect, *pxmp);
-				*/
 		}
 	}
 	show();
