@@ -1,13 +1,16 @@
 #pragma once 
 
 #include <iostream>
+#include <qgraphicsscene>
 #include <QGraphicsView>
-#include <QGraphicsLayoutItem>
 #include <QGraphicsRectItem>
 #include <QApplication>
 #include <QMainWindow>
 #include <QLabel>
 #include <vector>
+#include <QGraphicsLayoutItem>
+
+#include <QBoxLayout>
 
 #include <QDebug>
 #include <QFile>
@@ -19,13 +22,17 @@
 #define BOARD_HEIGHT 8
 
 /*Drawing the playing-field here*/
-class Chessboard : public QGraphicsView, public QGraphicsLayoutItem
+class Chessgame : public QGraphicsView, public QGraphicsLayoutItem
 {
 	Q_OBJECT
 private:
+
 	QApplication& m_application;
 
-	std::vector<std::unique_ptr<ChessboardField>> m_rect_items;
+	Color m_playingColor;
+
+	std::shared_ptr<QGraphicsTextItem> m_infoButton;
+	std::vector<std::shared_ptr<ChessboardField>> m_fields;
 	std::vector<std::shared_ptr<Piece>> white, black;
 	
 	const wchar_t w = L'\u2659'
@@ -40,7 +47,7 @@ public:
 	static std::vector<QPixmap> create_pixmaps(int a_xSectors, int a_ySectors, const QPixmap& a_glob_pxmp);
 
 public:
-	Chessboard(QApplication& a_application, QGraphicsScene* a_scene, QSize a_windowrect);
+	Chessgame(QApplication& a_application, QGraphicsScene* a_scene, QSize a_windowrect);
 	
 	template <typename T>
 	void addPiece(Color a_color, int a_col, int a_row);
@@ -58,15 +65,39 @@ public:
 	void display();
 	void print();
 
+	void markLegalMoves(std::shared_ptr<Piece> a_piece);
+	void markNoMoves(std::shared_ptr<Piece> a_piece);
+
+	bool isMoveable(std::shared_ptr<Piece> a_piece);
+	void confirmMove();
+
+	template <typename T>
+	static void deleteElementFromList(std::shared_ptr<T> element, std::vector<std::shared_ptr<T>>& list);
+
+	void cleanPiece(std::shared_ptr<Piece> a_piece);
+
 	void resizeEvent(QResizeEvent* event) override;
 
-	virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const override{return QSizeF();}
+	virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF& constraint = QSizeF()) const override;
 };
 
 template<typename T>
-inline void Chessboard::addPiece(Color a_color, int a_col, int a_row)
+inline void Chessgame::addPiece(Color a_color, int a_col, int a_row)
 {
 	std::shared_ptr<T> piece = std::make_shared<T>(a_col, a_row, a_color);
 	((a_color == Color::White) ? white : black).push_back(piece);	
 	this->fieldAt(a_col, a_row)->setPiece(piece);
+}
+
+template<typename T>
+inline void Chessgame::deleteElementFromList(std::shared_ptr<T> element, std::vector<std::shared_ptr<T>>& list)
+{
+	for (auto it = list.begin(); it != list.end(); ++it)
+	{
+		if (it->get() == element.get())
+		{
+			list.erase(it);
+			break;
+		}
+	}
 }

@@ -6,22 +6,22 @@
 
 #include "Pieces.h"
 
-class Chessboard;
+class Chessgame;
 
 class ChessboardField : public QGraphicsRectItem
 {
 private:
-	Chessboard* m_chessboard;	
+	Chessgame* m_chessgame;	
 	char m_column, m_row;
 	
 	std::shared_ptr<Piece> m_piece;
 	std::unique_ptr<QGraphicsPixmapItem> m_pxmapItem;
 
-
+	std::unique_ptr<QGraphicsEllipseItem> m_legalMarker;
 	std::unique_ptr<QGraphicsPixmapItem> m_draggedPiece;
 
 public:
-	ChessboardField(char x, char y, Chessboard* a_chessboard);
+	ChessboardField(char x, char y, Chessgame* a_chessgame);
 	QString getText();
 
 
@@ -31,6 +31,8 @@ public:
 	void setPiece(std::shared_ptr<Piece> a_piece = std::shared_ptr<Piece>());
 	std::shared_ptr<Piece> getPiece();
 
+	void setMarkLegal(bool a_marked);
+	void cleanPiece();
 protected:
 	void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget);
 

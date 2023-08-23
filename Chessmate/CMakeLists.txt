@@ -33,4 +33,4 @@ endif(MSVC)
 
 
 # TODO: Add tests and install targets if needed.
-include_directories(Chessmate "ENV{QTDIR}/include")
+include_directories(Chessmate "$ENV{QTDIR}/include")

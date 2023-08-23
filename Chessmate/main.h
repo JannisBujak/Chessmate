@@ -10,13 +10,15 @@
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QPushButton>
+#include <qgraphicslinearlayout>
 #include <QGridLayout>
 #include <QFrame>
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QGraphicsRectItem>
 
-#include "Chessboard.h"
+
+#include "Chessgame.h"
 // TODO: Reference additional headers your program requires here.
 
 
