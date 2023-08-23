@@ -5,41 +5,28 @@
 
 #include "qgraphicslinearlayout.h"
 
-#define USE_UI true
-
 using namespace std;
-
 
 int main(int argc, char** argv)
 {	
 	// QT-Game-UI
-
-#if USE_UI
 	QApplication app(argc, argv);
 
 	// Chess-stuff
-	
-	QGraphicsScene scene;
-	QGraphicsView view;	
 
-	QGraphicsLinearLayout *windowLayout = new QGraphicsLinearLayout(Qt::Vertical);
-	QVBoxLayout layout;
-	
-	Chessboard* chessgame = new Chessboard(app, &scene, QSize(960, 540));
+	auto outer_scene = new QGraphicsScene(&app);
+    auto outer_view = new QGraphicsView (outer_scene);
 
-	windowLayout->addItem(chessgame);
+    auto main_layout = new QVBoxLayout();
+    outer_view->setLayout(main_layout);
 
-	view.setLayout(windowLayout);
-	view.display();
-	
-	// chessgame->display();
-	
-	app.exec();
+    main_layout->addWidget(new QLabel("Text"));
+    QGraphicsScene inner_scene;
+    Chessboard* chessgame = new Chessboard(app, &inner_scene, QSize(960, 540));
+    chessgame->display();
 
-#else 
-	_setmode(_fileno(stdout), _O_U16TEXT);
-	chessboard.print();
-	system("pause");
+    main_layout->addWidget(chessgame);
 
-#endif
+    outer_view->show();
+    app.exec();
 }
