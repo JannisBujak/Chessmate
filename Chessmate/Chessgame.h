@@ -30,7 +30,7 @@ private:
 
 	std::shared_ptr<QGraphicsTextItem> m_infoButton;
 	std::vector<std::shared_ptr<ChessboardField>> m_fields;
-	std::vector<std::shared_ptr<Piece>> white, black;
+	std::vector<std::shared_ptr<Pieces::Piece>> white, black;
 	
 	const wchar_t w = L'\u2659'
 		, b = L'\u265F';
@@ -63,7 +63,7 @@ public slots:
 	void init();
 
 public:
-	std::shared_ptr<Piece> pieceAt(int x, int y) const; 
+	std::shared_ptr<Pieces::Piece> pieceAt(int x, int y) const;
 
 	ChessboardField* fieldAt(int x, int y);
 
@@ -73,16 +73,18 @@ public:
 	void display();
 	void print();
 
-	void markLegalMoves(std::shared_ptr<Piece> a_piece);
-	void markNoMoves(std::shared_ptr<Piece> a_piece);
+	void markLegalMoves(std::shared_ptr<Pieces::Piece> a_piece);
+	void markNoMoves();
 
-	bool isMoveable(std::shared_ptr<Piece> a_piece);
+	bool isMoveable(std::shared_ptr<Pieces::Piece> a_piece);
+	
+	void checkForWin();
 	void confirmMove();
 
 	template <typename T>
 	static void deleteElementFromList(std::shared_ptr<T> element, std::vector<std::shared_ptr<T>>& list);
 
-	void cleanPiece(std::shared_ptr<Piece> a_piece);
+	void cleanPiece(std::shared_ptr<Pieces::Piece> a_piece);
 
 	void resizeEvent(QResizeEvent* event) override;
 
@@ -90,6 +92,10 @@ public:
 
 signals:
 	void playingColorChanged(Color);
+	void playerWon(Color);
+
+public:
+	bool handlePieceDraggedFromTo(ChessboardField* drag_from, ChessboardField* drag_to);
 };
 
 template<typename T>

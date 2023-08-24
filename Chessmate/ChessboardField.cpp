@@ -28,19 +28,19 @@ void ChessboardField::updateDraggedPos(QGraphicsSceneMouseEvent* event)
 	}
 }
 
-QPointF ChessboardField::getBoardPos() const
+QPoint ChessboardField::getBoardPos() const
 {
-	return QPointF(m_column, m_row);
+	return QPoint(m_column, m_row);
 }
 
-void ChessboardField::setPiece(std::shared_ptr<Piece> a_piece)
+void ChessboardField::setPiece(std::shared_ptr<Pieces::Piece> a_piece)
 {
 	this->m_piece = a_piece;
 	if (!this->m_piece)
 		m_pxmapItem.reset();
 }
 
-std::shared_ptr<Piece> ChessboardField::getPiece()
+std::shared_ptr<Pieces::Piece> ChessboardField::getPiece()
 {
 	return m_piece;
 }
@@ -50,11 +50,12 @@ void ChessboardField::setMarkLegal(bool a_marked)
 	if (a_marked)
 	{
 		QPointF size = boundingRect().bottomRight() - boundingRect().topLeft();
-		QPointF point = pos() ;
-		m_legalMarker = std::make_unique<QGraphicsEllipseItem>(point.x(), point.y(), size.x(), size.y());
+		QPointF point = pos();
+		m_legalMarker = std::make_unique<QGraphicsEllipseItem>(point.x(), point.y(), size.x(), size.y(), this);
 		m_legalMarker->setBrush(QColor(50, 200, 50));
 		QRectF bounding = sceneBoundingRect();
-		m_legalMarker->setPos(bounding.topLeft());		
+		m_legalMarker->setPos(bounding.topLeft());
+		m_legalMarker->show();
 	}
 	else {
 		m_legalMarker.reset();
@@ -104,8 +105,6 @@ void ChessboardField::mousePressEvent(QGraphicsSceneMouseEvent* event)
 		m_draggedPiece->setZValue(1);
 		updateDraggedPos(event);
 		m_chessgame->markLegalMoves(m_piece);
-
-		// TODO: Valide Zuege markieren
 	}
 	else 
 		m_draggedPiece.reset();
@@ -114,30 +113,16 @@ void ChessboardField::mousePressEvent(QGraphicsSceneMouseEvent* event)
 void ChessboardField::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {	
 	ChessboardField* field_drop = m_chessgame->fieldAtScenePos(event->scenePos());
+	qDebug() << "From" << getText() << "to" << ((field_drop) ? field_drop->getText() : QString("(%1, %2)").arg(event->scenePos().x()).arg(event->scenePos().y()));
 	
-	if (!m_piece || !m_chessgame->isMoveable(m_piece))
-		return;
-
-	if (field_drop && field_drop != this)
+	// Markierung legaler moves entfernen
+	if (m_chessgame->handlePieceDraggedFromTo(this, field_drop))
 	{
-		QPointF drop_pos = field_drop->getBoardPos();
-		int selX = drop_pos.x(), selY = drop_pos.y();
-
-		qDebug() << "From" << getText() << "to" << ((field_drop) ? field_drop->getText() : QString("(%1, %2)").arg(event->scenePos().x()).arg(event->scenePos().y()));
-
-		if (m_piece->move_valid(selX, selY, *m_chessgame))
-		{	
-			field_drop->cleanPiece();
-			field_drop->setPiece(m_piece);
-			m_piece->updatePosition(selX, selY);
-			m_draggedPiece.reset();
-			m_pxmapItem.reset();
-			m_piece.reset();
-			m_chessgame->confirmMove();
-			return;
-		}
+		this->m_piece.reset();
+		m_pxmapItem.reset();
+	}else{
+		qDebug() << "Canceled";
 	}
-	qDebug() << "Canceled";
 	m_draggedPiece.reset();
 }
 

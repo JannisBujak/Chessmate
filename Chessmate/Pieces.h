@@ -15,87 +15,90 @@ enum class Color
 	Black
 };
 
-struct Piece
+namespace Pieces
 {
-public:
-	static std::vector<QPixmap> glob_ChessPiecesBitmap;
+	struct Piece
+	{
+	public:
+		static std::vector<QPixmap> glob_ChessPiecesBitmap;
 
-protected:
-	int m_col, m_row;
-	Color m_color;
-	static int instancecount;
-protected:
-	Piece(int a_col, int a_row, Color a_color);
-	~Piece();
-public:
-	virtual QPixmap& get_pxmap() = 0;
+	protected:
+		int m_col, m_row;
+		Color m_color;
+	protected:
+		Piece(int a_col, int a_row, Color a_color);
 
-protected:
-	virtual bool piece_moveable(int a_col, int a_row, const Chessgame& a_board) const = 0;
+	public:
+		virtual QPixmap& get_pxmap() = 0;
 
-public:
-	Color getColor();
+	protected:
+		virtual bool piece_moveable(int a_col, int a_row, const Chessgame& a_board) const = 0;
 
-	bool same_pos(int a_col, int a_row);
+	public:
+		Color getColor();
 
-	bool same_diagonale(int a_col, int a_row) const;
-	bool same_row_or_column(int a_col, int a_row) const;
+		bool same_pos(int a_col, int a_row);
 
-	bool pieces_blocking(int a_col, int a_row, const Chessgame& a_board) const;
-	bool abandons_king(int a_col, int a_row, const Chessgame& a_board) const;
+		bool same_diagonale(int a_col, int a_row) const;
+		bool same_row_or_column(int a_col, int a_row) const;
 
-	void updatePosition(int a_col, int a_row);
-	bool move_valid(int a_col, int a_row, const Chessgame& a_board);
-};
+		bool pieces_blocking(int a_col, int a_row, const Chessgame& a_board) const;
+		bool abandons_king(int a_col, int a_row, const Chessgame& a_board) const;
 
-struct Pawn : public Piece
-{
-	int m_origRow;
-	Pawn(int a_col, int a_row, Color a_color);
-	
-	virtual QPixmap& get_pxmap() override;
-	bool piece_moveable(int a_col, int a_row, const Chessgame& a_board) const override;
-};
+		void updatePosition(int a_col, int a_row);
+		bool move_valid(int a_col, int a_row, const Chessgame& a_board);
 
-// Turm 
-struct Rook : public Piece
-{	
-	Rook(int a_col, int a_row, Color a_color);
-	
-	virtual QPixmap& get_pxmap() override;
-	bool piece_moveable(int a_col, int a_row, const Chessgame& a_board) const override;
-};
+		QPointF getBoardPos() const;
+	};
 
-struct Knight : public Piece
-{
-	Knight(int a_col, int a_row, Color a_color);
-	
-	virtual QPixmap& get_pxmap() override;
-	bool piece_moveable(int a_col, int a_row, const Chessgame& a_board) const override;
-};
+	struct Pawn : public Piece
+	{
+		int m_origRow;
+		Pawn(int a_col, int a_row, Color a_color);
 
-struct Bishop : public Piece
-{
-	Bishop(int a_col, int a_row, Color a_color);
+		virtual QPixmap& get_pxmap() override;
+		bool piece_moveable(int a_col, int a_row, const Chessgame& a_board) const override;
+	};
 
-	virtual QPixmap& get_pxmap() override;
-	bool piece_moveable(int a_col, int a_row, const Chessgame& a_board) const override;
-};
+	// Turm 
+	struct Rook : public Piece
+	{
+		Rook(int a_col, int a_row, Color a_color);
 
-struct Queen : public Piece
-{	
-	Queen(int a_col, int a_row, Color a_color);
+		virtual QPixmap& get_pxmap() override;
+		bool piece_moveable(int a_col, int a_row, const Chessgame& a_board) const override;
+	};
 
-	virtual QPixmap& get_pxmap() override;
-	bool piece_moveable(int a_col, int a_row, const Chessgame& a_board) const override;
-};
+	struct Knight : public Piece
+	{
+		Knight(int a_col, int a_row, Color a_color);
 
-struct King : public Piece
-{
-	King(int a_col, int a_row, Color a_color);
+		virtual QPixmap& get_pxmap() override;
+		bool piece_moveable(int a_col, int a_row, const Chessgame& a_board) const override;
+	};
 
-	virtual QPixmap& get_pxmap() override;
-	bool piece_moveable(int a_col, int a_row, const Chessgame& a_board) const override;
-};
+	struct Bishop : public Piece
+	{
+		Bishop(int a_col, int a_row, Color a_color);
 
+		virtual QPixmap& get_pxmap() override;
+		bool piece_moveable(int a_col, int a_row, const Chessgame& a_board) const override;
+	};
+
+	struct Queen : public Piece
+	{
+		Queen(int a_col, int a_row, Color a_color);
+
+		virtual QPixmap& get_pxmap() override;
+		bool piece_moveable(int a_col, int a_row, const Chessgame& a_board) const override;
+	};
+
+	struct King : public Piece
+	{
+		King(int a_col, int a_row, Color a_color);
+
+		virtual QPixmap& get_pxmap() override;
+		bool piece_moveable(int a_col, int a_row, const Chessgame& a_board) const override;
+	};
+}
 

@@ -35,7 +35,7 @@ Chessgame::Chessgame(QGraphicsScene* a_scene)
 		scene()->addItem(r.get());
 	}	
 
-	Piece::glob_ChessPiecesBitmap = create_pixmaps(4, 3, QPixmap(m_filename));
+	Pieces::Piece::glob_ChessPiecesBitmap = create_pixmaps(4, 3, QPixmap(m_filename));
 }
 
 Color Chessgame::playingColor()
@@ -56,14 +56,14 @@ void Chessgame::setPlayingColor(Color a_playingColor)
 
 void Chessgame::fillBackrow(Color a_color, int a_col)
 {	
-	addPiece	<Rook>		(a_color, 0, a_col);
-	addPiece	<Knight>	(a_color, 1, a_col);
-	addPiece	<Bishop>	(a_color, 2, a_col);
-	addPiece	<Queen>		(a_color, 3, a_col);
-	addPiece	<King>		(a_color, 4, a_col);
-	addPiece	<Bishop>	(a_color, 5, a_col);
-	addPiece	<Knight>	(a_color, 6, a_col);
-	addPiece	<Rook>		(a_color, 7, a_col);	
+	addPiece	<Pieces::Rook>		(a_color, 0, a_col);
+	addPiece	<Pieces::Knight>	(a_color, 1, a_col);
+	addPiece	<Pieces::Bishop>	(a_color, 2, a_col);
+	addPiece	<Pieces::Queen>		(a_color, 3, a_col);
+	addPiece	<Pieces::King>		(a_color, 4, a_col);
+	addPiece	<Pieces::Bishop>	(a_color, 5, a_col);
+	addPiece	<Pieces::Knight>	(a_color, 6, a_col);
+	addPiece	<Pieces::Rook>		(a_color, 7, a_col);	
 }
 
 void Chessgame::removeAllPieces()
@@ -86,8 +86,8 @@ void Chessgame::init()
 
 	for (int x = 0; x < BOARD_WIDTH; ++x)
 	{
-		addPiece <Pawn> (Color::White, x, 6);
-		addPiece <Pawn> (Color::Black, x, 1);
+		addPiece <Pieces::Pawn> (Color::White, x, 6);
+		addPiece <Pieces::Pawn> (Color::Black, x, 1);
 	}
 	
 	fillBackrow(Color::Black, 0);
@@ -97,9 +97,9 @@ void Chessgame::init()
 	display();
 }
 
-std::shared_ptr<Piece> Chessgame::pieceAt(int x, int y) const
+std::shared_ptr<Pieces::Piece> Chessgame::pieceAt(int x, int y) const
 {
-	for (std::shared_ptr<Piece> w : white)
+	for (std::shared_ptr<Pieces::Piece> w : white)
 	{
 		if (w->same_pos(x, y))
 		{
@@ -107,14 +107,14 @@ std::shared_ptr<Piece> Chessgame::pieceAt(int x, int y) const
 		}
 	}
 
-	for (std::shared_ptr<Piece> b : black)
+	for (std::shared_ptr<Pieces::Piece> b : black)
 	{
 		if (b->same_pos(x, y))
 		{
 			return b;
 		}
 	}
-	return std::shared_ptr<Piece>();
+	return std::shared_ptr<Pieces::Piece>();
 }
 
 ChessboardField* Chessgame::fieldAt(int x, int y)
@@ -144,7 +144,7 @@ ChessboardField* Chessgame::display_field(int x, int y, const QRectF& a_rect)
 	else
 		field->setBrush(QColor(234, 182, 118));
 		
-	std::shared_ptr<Piece> piece;
+	std::shared_ptr<Pieces::Piece> piece;
 	if (piece = field->getPiece())
 	{
 		display_label(x, y, a_rect, piece->get_pxmap());
@@ -190,20 +190,23 @@ void Chessgame::display()
 	}
 }
 
-void Chessgame::markLegalMoves(std::shared_ptr<Piece> a_piece)
+void Chessgame::markLegalMoves(std::shared_ptr<Pieces::Piece> a_piece)
 {
+	std::vector< std::shared_ptr<ChessboardField>> legal_fields;
 	for (std::shared_ptr<ChessboardField> field : m_fields)
 	{
 		auto [fieldX, fieldY] = field->getBoardPos();
-		if(a_piece->move_valid(fieldX, fieldY, *this))
+		if (a_piece->move_valid(fieldX, fieldY, *this))
 		{
-			field->setMarkLegal(true);
+			legal_fields.push_back(field);
 		}
 	}
-	qDebug() << " ";
+
+	for (auto field : legal_fields)
+		field->setMarkLegal(true);
 }
 
-void Chessgame::markNoMoves(std::shared_ptr<Piece> a_piece)
+void Chessgame::markNoMoves()
 {
 	for (std::shared_ptr<ChessboardField> field : m_fields)
 	{
@@ -211,19 +214,64 @@ void Chessgame::markNoMoves(std::shared_ptr<Piece> a_piece)
 	}
 }
 
-bool Chessgame::isMoveable(std::shared_ptr<Piece> a_piece)
+bool Chessgame::isMoveable(std::shared_ptr<Pieces::Piece> a_piece)
 {
 	auto pc = a_piece->getColor();
 	return playingColor() == pc;
+}
+
+void Chessgame::checkForWin()
+{
+	Pieces::King *bk, *wk;
+	// First get the two kings
+	for (auto e : black)	
+		if (bk = dynamic_cast<Pieces::King*>(e.get()))
+			break;
+	for (auto e : white)	
+		if (wk = dynamic_cast<Pieces::King*>(e.get()))
+			break;
+	Q_ASSERT(bk || wk);
+	if (!bk)
+	{
+		qDebug() << "No black King";
+		emit playerWon(Color::White);
+	}
+	else if (!wk)
+	{
+		qDebug() << "No white King";
+		emit playerWon(Color::Black);
+	}
+	else 
+	{
+		Pieces::King* checked_king;
+		std::vector<std::shared_ptr<Pieces::Piece>> opposing_pieces;
+		// Check if players king is under Attack
+		checked_king = (m_playingColor == Color::White) ? wk : bk;
+		opposing_pieces = (m_playingColor == Color::White) ? black : white;
+		
+		auto kingPos = checked_king->getBoardPos();
+
+		for (auto opposing_piece : opposing_pieces)
+		{
+			if (opposing_piece->move_valid(kingPos.x(), kingPos.y(), *this))
+			{
+				qDebug() << ((m_playingColor == Color::White) ? QString("White") : QString("Black")) << "King checked";
+			}
+		}
+
+	}
 }
 
 void Chessgame::confirmMove()
 {
 	// Toggles playing color
 	togglePlayingColor();
+
+	// Check if player is under attack and can defend
+	checkForWin();
 }
 
-void Chessgame::cleanPiece(std::shared_ptr<Piece> a_piece)
+void Chessgame::cleanPiece(std::shared_ptr<Pieces::Piece> a_piece)
 {
 	if (a_piece->getColor() == Color::White)
 	{
@@ -244,5 +292,32 @@ void Chessgame::resizeEvent(QResizeEvent* event)
 QSizeF Chessgame::sizeHint(Qt::SizeHint which, const QSizeF& constraint) const
 {
 	return QSizeF();
+}
+
+bool Chessgame::handlePieceDraggedFromTo(ChessboardField* drag_from, ChessboardField* drag_to)
+{
+	// Markierung legaler moves entfernen
+	markNoMoves();
+
+	if (!drag_from->getPiece() || !isMoveable(drag_from->getPiece()))
+		return false;
+
+	if (drag_to && drag_from != drag_to)
+	{
+		QPointF drop_pos = drag_to->getBoardPos();
+		int selX = drop_pos.x(), selY = drop_pos.y();
+
+		auto piece = drag_from->getPiece();
+
+		if (piece->move_valid(selX, selY, *this))
+		{
+			drag_to->cleanPiece();
+			drag_to->setPiece(piece);
+			piece->updatePosition(selX, selY);
+			confirmMove();
+			return true;
+		}
+	}
+	return false;
 }
 

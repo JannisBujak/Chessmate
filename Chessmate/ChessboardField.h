@@ -14,7 +14,7 @@ private:
 	Chessgame* m_chessgame;	
 	char m_column, m_row;
 	
-	std::shared_ptr<Piece> m_piece;
+	std::shared_ptr<Pieces::Piece> m_piece;
 	std::unique_ptr<QGraphicsPixmapItem> m_pxmapItem;
 
 	std::unique_ptr<QGraphicsEllipseItem> m_legalMarker;
@@ -24,12 +24,11 @@ public:
 	ChessboardField(char x, char y, Chessgame* a_chessgame);
 	QString getText();
 
-
 	void updateDraggedPos(QGraphicsSceneMouseEvent* event);
-	QPointF getBoardPos() const;
+	QPoint getBoardPos() const;
 
-	void setPiece(std::shared_ptr<Piece> a_piece = std::shared_ptr<Piece>());
-	std::shared_ptr<Piece> getPiece();
+	void setPiece(std::shared_ptr<Pieces::Piece> a_piece = std::shared_ptr<Pieces::Piece>());
+	std::shared_ptr<Pieces::Piece> getPiece();
 
 	void setMarkLegal(bool a_marked);
 	void cleanPiece();
