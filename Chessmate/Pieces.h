@@ -23,9 +23,10 @@ public:
 protected:
 	int m_col, m_row;
 	Color m_color;
-
+	static int instancecount;
 protected:
 	Piece(int a_col, int a_row, Color a_color);
+	~Piece();
 public:
 	virtual QPixmap& get_pxmap() = 0;
 

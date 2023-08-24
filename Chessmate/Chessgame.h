@@ -46,12 +46,23 @@ public:
 public:
 	Chessgame(QGraphicsScene* a_scene);
 	
+	Color playingColor();
+
+	void togglePlayingColor();
+
+	void setPlayingColor(Color a_playingColor);
+
 	template <typename T>
 	void addPiece(Color a_color, int a_col, int a_row);
 	
 	void fillBackrow(Color a_color, int a_col);
+
+	void removeAllPieces();
+
+public slots:
 	void init();
 
+public:
 	std::shared_ptr<Piece> pieceAt(int x, int y) const; 
 
 	ChessboardField* fieldAt(int x, int y);
@@ -76,6 +87,9 @@ public:
 	void resizeEvent(QResizeEvent* event) override;
 
 	virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF& constraint = QSizeF()) const override;
+
+signals:
+	void playingColorChanged(Color);
 };
 
 template<typename T>

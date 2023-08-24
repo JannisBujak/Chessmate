@@ -21,7 +21,6 @@ std::vector<QPixmap> Chessgame::create_pixmaps(int a_xSectors, int a_ySectors, c
 
 Chessgame::Chessgame(QGraphicsScene* a_scene)
 	: QGraphicsView(a_scene)
-	, m_playingColor(Color::White)
 	, m_infoButton(std::make_shared<QGraphicsTextItem>())
 {	
 	this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -37,8 +36,22 @@ Chessgame::Chessgame(QGraphicsScene* a_scene)
 	}	
 
 	Piece::glob_ChessPiecesBitmap = create_pixmaps(4, 3, QPixmap(m_filename));
-	
-	init();
+}
+
+Color Chessgame::playingColor()
+{
+	return m_playingColor;
+}
+
+void Chessgame::togglePlayingColor()
+{
+	setPlayingColor((playingColor() == Color::Black) ? Color::White : Color::Black);
+}
+
+void Chessgame::setPlayingColor(Color a_playingColor)
+{
+	m_playingColor = a_playingColor;
+	emit playingColorChanged(m_playingColor);
 }
 
 void Chessgame::fillBackrow(Color a_color, int a_col)
@@ -53,8 +66,24 @@ void Chessgame::fillBackrow(Color a_color, int a_col)
 	addPiece	<Rook>		(a_color, 7, a_col);	
 }
 
+void Chessgame::removeAllPieces()
+{
+	if (!white.empty())
+		white.clear();
+	if (!black.empty())
+		black.clear();
+
+	for(auto& field : m_fields)
+	{
+		field->setPiece();
+	}
+}
+
 void Chessgame::init()
 {
+	removeAllPieces();
+	setPlayingColor(Color::White);
+
 	for (int x = 0; x < BOARD_WIDTH; ++x)
 	{
 		addPiece <Pawn> (Color::White, x, 6);
@@ -65,6 +94,7 @@ void Chessgame::init()
 	fillBackrow(Color::White, 7);
 
 	// R K B Q K B K R
+	display();
 }
 
 std::shared_ptr<Piece> Chessgame::pieceAt(int x, int y) const
@@ -146,7 +176,7 @@ void Chessgame::display()
 	QRectF rect;
 
 	// m_infoButton->setRect(0, 0, 200, 200);
-	m_infoButton->setPlainText(QString("%1 to move").arg((m_playingColor == Color::White) ? QString("White") : QString("Black")));
+	m_infoButton->setPlainText(QString("%1 to move").arg((playingColor() == Color::White) ? QString("White") : QString("Black")));
 	
 	for (int y = 0; y < BOARD_HEIGHT; y++)
 	{
@@ -158,7 +188,6 @@ void Chessgame::display()
 			int counter = y * BOARD_WIDTH + x;
 		}
 	}
-	show();
 }
 
 void Chessgame::markLegalMoves(std::shared_ptr<Piece> a_piece)
@@ -185,13 +214,13 @@ void Chessgame::markNoMoves(std::shared_ptr<Piece> a_piece)
 bool Chessgame::isMoveable(std::shared_ptr<Piece> a_piece)
 {
 	auto pc = a_piece->getColor();
-	return m_playingColor == pc;
+	return playingColor() == pc;
 }
 
 void Chessgame::confirmMove()
 {
 	// Toggles playing color
-	m_playingColor = (m_playingColor == Color::White) ? Color::Black : Color::White;
+	togglePlayingColor();
 }
 
 void Chessgame::cleanPiece(std::shared_ptr<Piece> a_piece)

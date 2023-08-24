@@ -4,11 +4,20 @@
 
 std::vector<QPixmap> Piece::glob_ChessPiecesBitmap;
 
+int Piece::instancecount;
+
 Piece::Piece(int a_col, int a_row, Color a_color)
 	: m_col(a_col)
 	, m_row(a_row)
 	, m_color(a_color)
-{}
+{
+	qDebug() << "Create nr" << ++instancecount;
+}
+
+Piece::~Piece()
+{
+	qDebug() << "Delete nr" << instancecount --;
+}
 
 QPixmap& Pawn::get_pxmap()
 {
@@ -109,14 +118,9 @@ bool Piece::move_valid(int a_col, int a_row, const Chessgame& a_board)
 {
 	bool a, b, c, d;
 	a = !same_pos(a_col, a_row);
-	b = piece_moveable(a_col, a_row, a_board);
-	if (!b)
-	{
-		qDebug() << "Move invalid for piece";
-	}
+	b = piece_moveable(a_col, a_row, a_board);	
 	c = !pieces_blocking(a_col, a_row, a_board);
 	d = !abandons_king(a_col, a_row, a_board);
-	qDebug() << a << b << c << d;
 	return a && b && c && d;
 }
 

@@ -11,8 +11,6 @@ ChessboardField::ChessboardField(char a_column, char a_row, Chessgame* a_chessga
 	, m_row(a_row)
 	, m_pxmapItem(nullptr)
 {
-	qDebug() << "Created field" << getText();
-	
 	setAcceptDrops(true); 
 }
 
@@ -38,6 +36,8 @@ QPointF ChessboardField::getBoardPos() const
 void ChessboardField::setPiece(std::shared_ptr<Piece> a_piece)
 {
 	this->m_piece = a_piece;
+	if (!this->m_piece)
+		m_pxmapItem.reset();
 }
 
 std::shared_ptr<Piece> ChessboardField::getPiece()
@@ -54,9 +54,7 @@ void ChessboardField::setMarkLegal(bool a_marked)
 		m_legalMarker = std::make_unique<QGraphicsEllipseItem>(point.x(), point.y(), size.x(), size.y());
 		m_legalMarker->setBrush(QColor(50, 200, 50));
 		QRectF bounding = sceneBoundingRect();
-		m_legalMarker->setPos(bounding.topLeft());
-		qDebug() << point;
-		// m_legalMarker->setPos(point);
+		m_legalMarker->setPos(bounding.topLeft());		
 	}
 	else {
 		m_legalMarker.reset();
@@ -69,7 +67,6 @@ void ChessboardField::cleanPiece()
 	{
 		m_chessgame->cleanPiece(m_piece);
 	}
-
 }
 
 void ChessboardField::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
@@ -95,9 +92,7 @@ void ChessboardField::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 }
 
 void ChessboardField::mousePressEvent(QGraphicsSceneMouseEvent* event)
-{
-	qDebug() << "Click" << getText();
-	
+{	
 	if (m_piece && m_chessgame->isMoveable(m_piece))
 	{
 		QPixmap pixmap = m_piece->get_pxmap();
