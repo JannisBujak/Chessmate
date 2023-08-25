@@ -23,7 +23,7 @@ namespace Pieces
 		static std::vector<QPixmap> glob_ChessPiecesBitmap;
 
 	protected:
-		int m_col, m_row;
+		int m_column, m_row;
 		Color m_color;
 	protected:
 		Piece(int a_col, int a_row, Color a_color);
@@ -43,10 +43,10 @@ namespace Pieces
 		bool same_row_or_column(int a_col, int a_row) const;
 
 		bool pieces_blocking(int a_col, int a_row, const Chessgame& a_board) const;
-		bool abandons_king(int a_col, int a_row, const Chessgame& a_board) const;
+		bool abandons_king(int a_col, int a_row, Chessgame& a_board) const;
 
 		void updatePosition(int a_col, int a_row);
-		bool move_valid(int a_col, int a_row, const Chessgame& a_board);
+		bool move_valid(int a_col, int a_row, Chessgame& a_board);
 
 		QPointF getBoardPos() const;
 	};

@@ -220,16 +220,31 @@ bool Chessgame::isMoveable(std::shared_ptr<Pieces::Piece> a_piece)
 	return playingColor() == pc;
 }
 
+Pieces::King* Chessgame::getKingFromList(std::vector < std::shared_ptr<Pieces::Piece>> a_ColoredPieces)
+{
+	Pieces::King* king;
+	for (auto e : a_ColoredPieces)
+		if (king = dynamic_cast<Pieces::King*>(e.get()))
+			return king;
+
+	return nullptr;
+}
+
+Pieces::King* Chessgame::getKingFromList(Color a_color)
+{
+	return getKingFromList((a_color == Color::Black) ? black : white);
+}
+
+std::vector<std::shared_ptr<Pieces::Piece>> Chessgame::getListOfColor(Color a_color)
+{
+	return (a_color == Color::Black) ? black : white;
+}
+
 void Chessgame::checkForWin()
 {
-	Pieces::King *bk, *wk;
 	// First get the two kings
-	for (auto e : black)	
-		if (bk = dynamic_cast<Pieces::King*>(e.get()))
-			break;
-	for (auto e : white)	
-		if (wk = dynamic_cast<Pieces::King*>(e.get()))
-			break;
+	Pieces::King *bk = getKingFromList(black)
+		, *wk = getKingFromList(white);
 	Q_ASSERT(bk || wk);
 	if (!bk)
 	{
@@ -258,7 +273,6 @@ void Chessgame::checkForWin()
 				qDebug() << ((m_playingColor == Color::White) ? QString("White") : QString("Black")) << "King checked";
 			}
 		}
-
 	}
 }
 

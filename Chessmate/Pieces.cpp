@@ -7,7 +7,7 @@ namespace Pieces
 	std::vector<QPixmap> Piece::glob_ChessPiecesBitmap;
 
 	Piece::Piece(int a_col, int a_row, Color a_color)
-		: m_col(a_col)
+		: m_column(a_col)
 		, m_row(a_row)
 		, m_color(a_color)
 	{
@@ -29,14 +29,14 @@ namespace Pieces
 	{
 		int yMov = (m_color == Color::Black) ? 1 : -1;
 		// Move up
-		if (m_col == a_col)
+		if (m_column == a_col)
 		{
 			if (a_row == m_row + yMov || (m_row == m_origRow && a_row == m_row + 2 * yMov))
 			{
 				return !a_board.pieceAt(a_col, a_row);
 			}
 		}
-		else if (abs(m_col - a_col) == 1)
+		else if (abs(m_column - a_col) == 1)
 		{
 			if (a_row == m_row + yMov)
 				return a_board.pieceAt(a_col, a_row).get();
@@ -51,17 +51,17 @@ namespace Pieces
 
 	bool Piece::same_pos(int a_col, int a_row)
 	{
-		return this->m_col == a_col && this->m_row == a_row;
+		return this->m_column == a_col && this->m_row == a_row;
 	}
 
 	bool Piece::same_diagonale(int a_col, int a_row) const
 	{
-		return abs(this->m_col - a_col) == abs(this->m_row - a_row);
+		return abs(this->m_column - a_col) == abs(this->m_row - a_row);
 	}
 
 	bool Piece::same_row_or_column(int a_col, int a_row) const
 	{
-		return this->m_col == a_col || this->m_row == a_row;
+		return this->m_column == a_col || this->m_row == a_row;
 	}
 
 	bool Piece::pieces_blocking(int a_col, int a_row, const Chessgame& a_board) const
@@ -69,13 +69,13 @@ namespace Pieces
 		// Bei Bewegung auf Diagonalen/Reihe/Spalte ueberpruefen, ob was im Weg ist 
 		if (same_diagonale(a_col, a_row) || same_row_or_column(a_col, a_row))
 		{
-			int xMov = (a_col > m_col) ? 1 : ((a_col < m_col) ? -1 : 0)
+			int xMov = (a_col > m_column) ? 1 : ((a_col < m_column) ? -1 : 0)
 				, yMov = (a_row > m_row) ? 1 : ((a_row < m_row) ? -1 : 0)
-				, mov_range = std::max(abs(a_col - m_col), abs(a_row - m_row));
+				, mov_range = std::max(abs(a_col - m_column), abs(a_row - m_row));
 
 			for (int i = 1; i < mov_range; i++)
 			{
-				if (a_board.pieceAt(m_col + xMov * i, m_row + yMov * i))
+				if (a_board.pieceAt(m_column + xMov * i, m_row + yMov * i))
 				{
 					qDebug() << "Piece Blocking";
 					return true;
@@ -97,18 +97,21 @@ namespace Pieces
 		return false;
 	}
 
-	bool Piece::abandons_king(int a_col, int a_row, const Chessgame& a_board) const
+	bool Piece::abandons_king(int a_col, int a_row, Chessgame& a_board) const
 	{
+		auto allie_king = a_board.getKingFromList(m_color);		
+		auto enemy_pieces = a_board.getListOfColor((m_color == Color::Black) ? Color::White : Color::Black);
+
 		return false;
 	}
 
 	void Piece::updatePosition(int a_col, int a_row)
 	{
-		this->m_col = a_col;
+		this->m_column = a_col;
 		this->m_row = a_row;
 	}
 
-	bool Piece::move_valid(int a_col, int a_row, const Chessgame& a_board)
+	bool Piece::move_valid(int a_col, int a_row, Chessgame& a_board)
 	{
 		bool a, b, c, d;
 		a = !same_pos(a_col, a_row);
@@ -120,7 +123,7 @@ namespace Pieces
 
 	QPointF Piece::getBoardPos() const
 	{
-		return QPoint(m_col, m_row);
+		return QPoint(m_column, m_row);
 	}
 
 	Pawn::Pawn(int a_col, int a_row, Color a_color)
@@ -170,7 +173,7 @@ namespace Pieces
 
 	bool Knight::piece_moveable(int a_col, int a_row, const Chessgame& a_board) const
 	{
-		int XMov = abs(a_col - m_col)
+		int XMov = abs(a_col - m_column)
 			, yMov = abs(a_row - m_row);
 		bool a = (XMov + yMov == 3);
 		bool b = (abs(XMov - yMov) == 1);;
@@ -240,7 +243,7 @@ namespace Pieces
 
 	bool King::piece_moveable(int a_col, int a_row, const Chessgame& a_board) const
 	{
-		return (abs(a_col - m_col) <= 1) && (abs(a_row - m_row) <= 1);
+		return (abs(a_col - m_column) <= 1) && (abs(a_row - m_row) <= 1);
 	}
 }
 

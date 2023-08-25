@@ -31,8 +31,12 @@ int main(int argc, char** argv)
         {
             playingPartyText->setText(QString("%1 team playing").arg(a_color == Color::White ? QString("White") : QString("Black")));
         });
+    app->connect(chessgame, &Chessgame::playerWon, [&](Color a_color)
+        {
+            playingPartyText->setText(QString("Player %1 won").arg(a_color == Color::White ? QString("white") : QString("black")));
+        });
 
-    auto restartGameButton = new QPushButton();
+    auto restartGameButton = new QPushButton("Restart");
     main_layout->addWidget(restartGameButton);
 
     app->connect(restartGameButton, &QPushButton::clicked, chessgame, &Chessgame::init);

@@ -78,6 +78,11 @@ public:
 
 	bool isMoveable(std::shared_ptr<Pieces::Piece> a_piece);
 	
+	static Pieces::King* getKingFromList(std::vector < std::shared_ptr<Pieces::Piece>> a_ColoredPieces);
+	Pieces::King* getKingFromList(Color a_color);
+	
+	std::vector<std::shared_ptr<Pieces::Piece>> getListOfColor(Color a_color);
+
 	void checkForWin();
 	void confirmMove();
 
