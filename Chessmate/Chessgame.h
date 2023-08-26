@@ -1,7 +1,7 @@
 #pragma once 
 
 #include <iostream>
-#include <qgraphicsscene>
+#include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QGraphicsRectItem>
 #include <QApplication>

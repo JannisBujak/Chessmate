@@ -10,7 +10,7 @@
 #include <QWidget>
 #include <QVBoxLayout>
 #include <QPushButton>
-#include <qgraphicslinearlayout>
+#include <QGraphicsLinearLayout>
 #include <QGridLayout>
 #include <QFrame>
 #include <QGraphicsScene>
