@@ -113,6 +113,8 @@ namespace Pieces
 	{
 		Chessboard copy = a_board;
 
+		// TODO: Schlagen als rettung (außer bei König) geht nicht
+
 		auto this_piece = copy.pieceAt(m_column, m_row);
 		this_piece->m_column = a_col;
 		this_piece->m_row = a_row;
