@@ -1,6 +1,6 @@
 #include "Pieces.h"
 
-#include "Chessgame.h"
+#include "ChessGameVisualisation.h"
 
 namespace Pieces
 {
@@ -32,7 +32,7 @@ namespace Pieces
 		};
 	}
 
-	bool Pawn::piece_moveable(int a_col, int a_row, const Chessboard& a_board) const
+	bool Pawn::piece_moveable(int a_col, int a_row, const ChessGame& a_board) const
 	{
 		int yMov = (m_color == Color::Black) ? 1 : -1;
 		// Move up
@@ -76,7 +76,7 @@ namespace Pieces
 		return this->m_column == a_col || this->m_row == a_row;
 	}
 
-	bool Piece::pieces_blocking(int a_col, int a_row, const Chessboard& a_board) const
+	bool Piece::pieces_blocking(int a_col, int a_row, const ChessGame& a_board) const
 	{
 		// Bei Bewegung auf Diagonalen/Reihe/Spalte ueberpruefen, ob was im Weg ist 
 		if (same_diagonale(a_col, a_row) || same_row_or_column(a_col, a_row))
@@ -109,11 +109,11 @@ namespace Pieces
 		return false;
 	}
 
-	bool Piece::abandons_king(int a_col, int a_row, Chessboard& a_board) const
+	bool Piece::abandons_king(int a_col, int a_row, ChessGame& a_board) const
 	{
-		Chessboard copy = a_board;
+		ChessGame copy = a_board;
 
-		// TODO: Schlagen als rettung (außer bei König) geht nicht
+		// TODO: Schlagen als rettung (auï¿½er bei Kï¿½nig) geht nicht
 
 		auto this_piece = copy.pieceAt(m_column, m_row);
 		this_piece->m_column = a_col;
@@ -138,7 +138,7 @@ namespace Pieces
 		this->m_row = a_row;
 	}
 
-	bool Piece::move_valid(int a_col, int a_row, Chessboard& a_board)
+	bool Piece::move_valid(int a_col, int a_row, ChessGame& a_board)
 	{
 #if 0
 		bool a, b, c, d;
@@ -183,7 +183,7 @@ namespace Pieces
 		};
 	}
 
-	bool Rook::piece_moveable(int a_col, int a_row, const Chessboard& a_board) const
+	bool Rook::piece_moveable(int a_col, int a_row, const ChessGame& a_board) const
 	{
 		return same_row_or_column(a_col, a_row);
 	}
@@ -210,7 +210,7 @@ namespace Pieces
 		};
 	}
 
-	bool Knight::piece_moveable(int a_col, int a_row, const Chessboard& a_board) const
+	bool Knight::piece_moveable(int a_col, int a_row, const ChessGame& a_board) const
 	{
 		int XMov = abs(a_col - m_column)
 			, yMov = abs(a_row - m_row);
@@ -241,7 +241,7 @@ namespace Pieces
 		};
 	}
 
-	bool Bishop::piece_moveable(int a_col, int a_row, const Chessboard& a_board) const
+	bool Bishop::piece_moveable(int a_col, int a_row, const ChessGame& a_board) const
 	{
 		return same_diagonale(a_col, a_row);
 	}
@@ -268,7 +268,7 @@ namespace Pieces
 		};
 	}
 
-	bool Queen::piece_moveable(int a_col, int a_row, const Chessboard& a_board) const
+	bool Queen::piece_moveable(int a_col, int a_row, const ChessGame& a_board) const
 	{
 		return same_row_or_column(a_col, a_row) || same_diagonale(a_col, a_row);
 	}
@@ -295,7 +295,7 @@ namespace Pieces
 		};
 	}
 
-	bool King::piece_moveable(int a_col, int a_row, const Chessboard& a_board) const
+	bool King::piece_moveable(int a_col, int a_row, const ChessGame& a_board) const
 	{
 		return (abs(a_col - m_column) <= 1) && (abs(a_row - m_row) <= 1);
 	}

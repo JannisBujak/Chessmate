@@ -21,7 +21,7 @@
 #define BOARD_WIDTH 8
 #define BOARD_HEIGHT 8
 
-class Chessboard : public QObject
+class ChessGame : public QObject
 {
 	Q_OBJECT
 private:
@@ -29,8 +29,8 @@ private:
 	std::vector<std::shared_ptr<Pieces::Piece>> white, black;
 
 public:
-	Chessboard(QObject* parent = nullptr);
-	Chessboard(const Chessboard&);
+	ChessGame(QObject* parent = nullptr);
+	ChessGame(const ChessGame&);
 
 	template <typename T>
 	void addPiece(Color a_color, int a_col, int a_row);
@@ -69,7 +69,7 @@ signals:
 };
 
 /*Drawing the playing-field here*/
-class Chessgame : public QGraphicsView, public QGraphicsLayoutItem, public QObject, public Chessboard
+class ChessGameVisualisation : public QGraphicsView
 {
 	Q_OBJECT
 private:
@@ -77,12 +77,14 @@ private:
 	std::vector<std::shared_ptr<ChessboardField>> m_fields;
 	
 	const QString m_filename = QString("../../../../Chessmate/chess-icon/vecteezy_chess_icon-removebg.png");
-		
+
+    ChessGame m_ChessGame;
+
 public:
 	static std::vector<QPixmap> create_pixmaps(int a_xSectors, int a_ySectors, const QPixmap& a_glob_pxmp);
 
 public:
-	Chessgame(QGraphicsScene* a_scene);
+	ChessGameVisualisation(QGraphicsScene* a_scene);
 
 	void removeAllPieces();
 
@@ -102,25 +104,27 @@ public:
 
 	void markLegalMoves(std::shared_ptr<Pieces::Piece> a_piece);
 	void markNoMoves();
-
+    const ChessGame* getChessGame();
 	
 	void resizeEvent(QResizeEvent* event) override;
 
-	virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF& constraint = QSizeF()) const override;
-
 public:
 	bool handlePieceDraggedFromTo(ChessboardField* drag_from, ChessboardField* drag_to);
+
+    void cleanPiece(std::shared_ptr<Pieces::Piece> sharedPtr);
+
+    bool isMoveable(std::shared_ptr<Pieces::Piece> sharedPtr);
 };
 
 template<typename T>
-inline void Chessboard::addPiece(Color a_color, int a_col, int a_row)
+inline void ChessGame::addPiece(Color a_color, int a_col, int a_row)
 {
 	std::shared_ptr<T> piece = std::make_shared<T>(a_col, a_row, a_color);
 	((a_color == Color::White) ? white : black).push_back(piece);
 }
 
 template<typename T>
-inline void Chessboard::deleteElementFromList(std::shared_ptr<T> element, std::vector<std::shared_ptr<T>>& list)
+inline void ChessGame::deleteElementFromList(std::shared_ptr<T> element, std::vector<std::shared_ptr<T>>& list)
 {
 	for (auto it = list.begin(); it != list.end(); ++it)
 	{
