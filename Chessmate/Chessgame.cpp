@@ -4,7 +4,6 @@
 Chessboard::Chessboard(QObject* parent)
 	: QObject(parent)
 {
-	init();
 }
 
 Chessboard::Chessboard(const Chessboard& other)
@@ -235,6 +234,9 @@ void Chessgame::removeAllPieces()
 
 void Chessgame::init()
 {	
+	for (auto f : m_fields)
+		f->setPiece();
+	Chessboard::init();
 	auto pieces = getListOfPieces();
 	for (auto p : pieces)
 	{

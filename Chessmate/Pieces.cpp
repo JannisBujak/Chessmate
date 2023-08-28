@@ -109,21 +109,34 @@ namespace Pieces
 		return false;
 	}
 
-	bool Piece::abandons_king(int a_col, int a_row, Chessboard& a_board) const
+	bool Piece::abandons_king(int a_col, int a_row, const Chessboard& a_board, int level) const
 	{
+		if (level >= 1)
+		{
+			return false;
+		}
 		Chessboard copy = a_board;
-
-		// TODO: Schlagen als rettung (außer bei König) geht nicht
 
 		auto this_piece = copy.pieceAt(m_column, m_row);
 		this_piece->m_column = a_col;
 		this_piece->m_row = a_row;
-		auto kingpos = copy.getKingFromList(this->m_color)->getBoardPos();
-		auto enemy_pieces = copy.getListOfColor((this->m_color == Color::White) ? Color::Black : Color::White);
+		
+		// Remove taken piece 
+		auto taken_piece = copy.pieceAt(a_col, a_row);
+		if (taken_piece)
+			copy.cleanPiece(taken_piece);
+		
+		auto ally_king = copy.getKingFromList(this->m_color);
+		if (!ally_king)
+			return true;
 
+		auto kingpos = ally_king->getBoardPos();		
+		auto enemy_pieces = copy.getListOfColor((this->m_color == Color::White) ? Color::Black : Color::White);
+		
 		for (auto enemy : enemy_pieces)
 		{
-			if (enemy->move_valid(kingpos.x(), kingpos.y(), copy))
+
+			if (enemy->move_valid(kingpos.x(), kingpos.y(), copy, level+1))
 			{
 				return true;
 			}
@@ -138,7 +151,7 @@ namespace Pieces
 		this->m_row = a_row;
 	}
 
-	bool Piece::move_valid(int a_col, int a_row, Chessboard& a_board)
+	bool Piece::move_valid(int a_col, int a_row, const Chessboard& a_board, int level)
 	{
 #if 0
 		bool a, b, c, d;
@@ -151,7 +164,7 @@ namespace Pieces
 		return !same_pos(a_col, a_row)
 			&& piece_moveable(a_col, a_row, a_board)
 			&& !pieces_blocking(a_col, a_row, a_board)
-			&& !abandons_king(a_col, a_row, a_board);
+			&& !abandons_king(a_col, a_row, a_board, level);
 #endif
 	}
 

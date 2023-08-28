@@ -44,10 +44,10 @@ namespace Pieces
 		bool same_row_or_column(int a_col, int a_row) const;
 
 		bool pieces_blocking(int a_col, int a_row, const Chessboard& a_board) const;
-		bool abandons_king(int a_col, int a_row, Chessboard& a_board) const;
+		bool abandons_king(int a_col, int a_row, const Chessboard& a_board, int level) const;
 
 		void updatePosition(int a_col, int a_row);
-		bool move_valid(int a_col, int a_row, Chessboard& a_board);
+		bool move_valid(int a_col, int a_row, const Chessboard& a_board, int level = 0);
 
 		QPoint getBoardPos() const;
 
