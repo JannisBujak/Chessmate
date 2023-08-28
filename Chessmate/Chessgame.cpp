@@ -1,6 +1,189 @@
 #include "Chessgame.h"
 #include <qcolor.h>
 
+Chessboard::Chessboard(QObject* parent)
+	: QObject(parent)
+{
+	init();
+}
+
+Chessboard::Chessboard(const Chessboard& other)
+	: m_playingColor(other.m_playingColor)
+{
+	for (auto w : other.white)	
+		white.push_back(std::shared_ptr< Pieces::Piece>(w->clone()));
+	
+	for (auto b : other.black)
+		black.push_back(std::shared_ptr<Pieces::Piece>(b->clone()));
+}
+
+Color Chessboard::playingColor()
+{
+	return m_playingColor;
+}
+
+void Chessboard::togglePlayingColor()
+{
+	setPlayingColor((playingColor() == Color::Black) ? Color::White : Color::Black);
+}
+
+void Chessboard::setPlayingColor(Color a_playingColor)
+{
+	m_playingColor = a_playingColor;
+	emit playingColorChanged(m_playingColor);
+}
+
+void Chessboard::fillBackrow(Color a_color, int a_col)
+{
+	addPiece	<Pieces::Rook>(a_color, 0, a_col);
+	addPiece	<Pieces::Knight>(a_color, 1, a_col);
+	addPiece	<Pieces::Bishop>(a_color, 2, a_col);
+	addPiece	<Pieces::Queen>(a_color, 3, a_col);
+	addPiece	<Pieces::King>(a_color, 4, a_col);
+	addPiece	<Pieces::Bishop>(a_color, 5, a_col);
+	addPiece	<Pieces::Knight>(a_color, 6, a_col);
+	addPiece	<Pieces::Rook>(a_color, 7, a_col);
+}
+
+void Chessboard::removeAllPieces()
+{
+	if (!white.empty())
+		white.clear();
+	if (!black.empty())
+		black.clear();
+}
+
+bool Chessboard::isMoveable(std::shared_ptr<Pieces::Piece> a_piece)
+{
+	auto pc = a_piece->getColor();
+	return playingColor() == pc;
+}
+
+std::shared_ptr<Pieces::Piece> Chessboard::pieceAt(int x, int y) const
+{
+	for (std::shared_ptr<Pieces::Piece> w : white)
+	{
+		if (w->same_pos(x, y))
+		{
+			return w;
+		}
+	}
+
+	for (std::shared_ptr<Pieces::Piece> b : black)
+	{
+		if (b->same_pos(x, y))
+		{
+			return b;
+		}
+	}
+	return std::shared_ptr<Pieces::Piece>();
+}
+
+Pieces::King* Chessboard::getKingFromList(std::vector < std::shared_ptr<Pieces::Piece>> a_ColoredPieces)
+{
+	Pieces::King* king;
+	for (auto e : a_ColoredPieces)
+		if (king = dynamic_cast<Pieces::King*>(e.get()))
+			return king;
+
+	return nullptr;
+}
+
+Pieces::King* Chessboard::getKingFromList(Color a_color)
+{
+	return getKingFromList((a_color == Color::Black) ? black : white);
+}
+
+const std::vector<std::shared_ptr<Pieces::Piece>> Chessboard::getListOfColor(Color a_color) const
+{
+	return (a_color == Color::Black) ? black : white;
+}
+
+std::vector<std::shared_ptr<Pieces::Piece>> Chessboard::getListOfColor(Color a_color)
+{
+	return (a_color == Color::Black) ? black : white;
+}
+
+std::vector<std::shared_ptr<Pieces::Piece>> Chessboard::getListOfPieces()
+{
+	std::vector<std::shared_ptr<Pieces::Piece>> all_pieces = black;
+	all_pieces.insert(all_pieces.end(), white.begin(), white.end());
+
+	return all_pieces;
+}
+
+void Chessboard::checkForWin()
+{
+	// First get the two kings
+	Pieces::King* bk = getKingFromList(black)
+		, * wk = getKingFromList(white);
+	Q_ASSERT(bk || wk);
+	if (!bk)
+	{
+		qDebug() << "No black King";
+		emit playerWon(Color::White);
+	}
+	else if (!wk)
+	{
+		qDebug() << "No white King";
+		emit playerWon(Color::Black);
+	}
+	else
+	{
+		Pieces::King* checked_king;
+		std::vector<std::shared_ptr<Pieces::Piece>> opposing_pieces;
+		// Check if players king is under Attack
+		checked_king = (m_playingColor == Color::White) ? wk : bk;
+		opposing_pieces = (m_playingColor == Color::White) ? black : white;
+
+		auto kingPos = checked_king->getBoardPos();
+
+		for (auto opposing_piece : opposing_pieces)
+		{
+			if (opposing_piece->move_valid(kingPos.x(), kingPos.y(), *this))
+			{
+				qDebug() << ((m_playingColor == Color::White) ? QString("White") : QString("Black")) << "King checked";
+			}
+		}
+	}
+}
+
+void Chessboard::confirmMove()
+{
+	// Toggles playing color
+	togglePlayingColor();
+
+	// Check if player is under attack and can defend
+	checkForWin();
+}
+
+void Chessboard::cleanPiece(std::shared_ptr<Pieces::Piece> a_piece)
+{
+	if (a_piece->getColor() == Color::White)
+	{
+		deleteElementFromList(a_piece, white);
+	}
+	else
+	{
+		deleteElementFromList(a_piece, black);
+	}
+}
+
+void Chessboard::init()
+{
+	removeAllPieces();
+	setPlayingColor(Color::White);
+
+	for (int x = 0; x < BOARD_WIDTH; ++x)
+	{
+		addPiece <Pieces::Pawn> (Color::White, x, 6);
+		addPiece <Pieces::Pawn> (Color::Black, x, 1);
+	}
+	
+	fillBackrow(Color::Black, 0);
+	fillBackrow(Color::White, 7);
+}
+
 std::vector<QPixmap> Chessgame::create_pixmaps(int a_xSectors, int a_ySectors, const QPixmap& a_glob_pxmp)
 {
 	std::vector<QPixmap> pxmaps;
@@ -18,6 +201,8 @@ std::vector<QPixmap> Chessgame::create_pixmaps(int a_xSectors, int a_ySectors, c
 	}
 	return pxmaps;
 }
+
+
 
 Chessgame::Chessgame(QGraphicsScene* a_scene)
 	: QGraphicsView(a_scene)
@@ -38,41 +223,10 @@ Chessgame::Chessgame(QGraphicsScene* a_scene)
 	Pieces::Piece::glob_ChessPiecesBitmap = create_pixmaps(4, 3, QPixmap(m_filename));
 }
 
-Color Chessgame::playingColor()
-{
-	return m_playingColor;
-}
-
-void Chessgame::togglePlayingColor()
-{
-	setPlayingColor((playingColor() == Color::Black) ? Color::White : Color::Black);
-}
-
-void Chessgame::setPlayingColor(Color a_playingColor)
-{
-	m_playingColor = a_playingColor;
-	emit playingColorChanged(m_playingColor);
-}
-
-void Chessgame::fillBackrow(Color a_color, int a_col)
-{	
-	addPiece	<Pieces::Rook>		(a_color, 0, a_col);
-	addPiece	<Pieces::Knight>	(a_color, 1, a_col);
-	addPiece	<Pieces::Bishop>	(a_color, 2, a_col);
-	addPiece	<Pieces::Queen>		(a_color, 3, a_col);
-	addPiece	<Pieces::King>		(a_color, 4, a_col);
-	addPiece	<Pieces::Bishop>	(a_color, 5, a_col);
-	addPiece	<Pieces::Knight>	(a_color, 6, a_col);
-	addPiece	<Pieces::Rook>		(a_color, 7, a_col);	
-}
-
 void Chessgame::removeAllPieces()
 {
-	if (!white.empty())
-		white.clear();
-	if (!black.empty())
-		black.clear();
-
+	Chessboard::removeAllPieces();
+	
 	for(auto& field : m_fields)
 	{
 		field->setPiece();
@@ -80,41 +234,15 @@ void Chessgame::removeAllPieces()
 }
 
 void Chessgame::init()
-{
-	removeAllPieces();
-	setPlayingColor(Color::White);
-
-	for (int x = 0; x < BOARD_WIDTH; ++x)
+{	
+	auto pieces = getListOfPieces();
+	for (auto p : pieces)
 	{
-		addPiece <Pieces::Pawn> (Color::White, x, 6);
-		addPiece <Pieces::Pawn> (Color::Black, x, 1);
+		auto ppos = p->getBoardPos();
+		fieldAt(ppos.x(), ppos.y())->setPiece(p);
 	}
-	
-	fillBackrow(Color::Black, 0);
-	fillBackrow(Color::White, 7);
-
 	// R K B Q K B K R
 	display();
-}
-
-std::shared_ptr<Pieces::Piece> Chessgame::pieceAt(int x, int y) const
-{
-	for (std::shared_ptr<Pieces::Piece> w : white)
-	{
-		if (w->same_pos(x, y))
-		{
-			return w;
-		}
-	}
-
-	for (std::shared_ptr<Pieces::Piece> b : black)
-	{
-		if (b->same_pos(x, y))
-		{
-			return b;
-		}
-	}
-	return std::shared_ptr<Pieces::Piece>();
 }
 
 ChessboardField* Chessgame::fieldAt(int x, int y)
@@ -211,89 +339,6 @@ void Chessgame::markNoMoves()
 	for (std::shared_ptr<ChessboardField> field : m_fields)
 	{
 		field->setMarkLegal(false);		
-	}
-}
-
-bool Chessgame::isMoveable(std::shared_ptr<Pieces::Piece> a_piece)
-{
-	auto pc = a_piece->getColor();
-	return playingColor() == pc;
-}
-
-Pieces::King* Chessgame::getKingFromList(std::vector < std::shared_ptr<Pieces::Piece>> a_ColoredPieces)
-{
-	Pieces::King* king;
-	for (auto e : a_ColoredPieces)
-		if (king = dynamic_cast<Pieces::King*>(e.get()))
-			return king;
-
-	return nullptr;
-}
-
-Pieces::King* Chessgame::getKingFromList(Color a_color)
-{
-	return getKingFromList((a_color == Color::Black) ? black : white);
-}
-
-std::vector<std::shared_ptr<Pieces::Piece>> Chessgame::getListOfColor(Color a_color)
-{
-	return (a_color == Color::Black) ? black : white;
-}
-
-void Chessgame::checkForWin()
-{
-	// First get the two kings
-	Pieces::King *bk = getKingFromList(black)
-		, *wk = getKingFromList(white);
-	Q_ASSERT(bk || wk);
-	if (!bk)
-	{
-		qDebug() << "No black King";
-		emit playerWon(Color::White);
-	}
-	else if (!wk)
-	{
-		qDebug() << "No white King";
-		emit playerWon(Color::Black);
-	}
-	else 
-	{
-		Pieces::King* checked_king;
-		std::vector<std::shared_ptr<Pieces::Piece>> opposing_pieces;
-		// Check if players king is under Attack
-		checked_king = (m_playingColor == Color::White) ? wk : bk;
-		opposing_pieces = (m_playingColor == Color::White) ? black : white;
-		
-		auto kingPos = checked_king->getBoardPos();
-
-		for (auto opposing_piece : opposing_pieces)
-		{
-			if (opposing_piece->move_valid(kingPos.x(), kingPos.y(), *this))
-			{
-				qDebug() << ((m_playingColor == Color::White) ? QString("White") : QString("Black")) << "King checked";
-			}
-		}
-	}
-}
-
-void Chessgame::confirmMove()
-{
-	// Toggles playing color
-	togglePlayingColor();
-
-	// Check if player is under attack and can defend
-	checkForWin();
-}
-
-void Chessgame::cleanPiece(std::shared_ptr<Pieces::Piece> a_piece)
-{
-	if (a_piece->getColor() == Color::White)
-	{
-		deleteElementFromList(a_piece, white);
-	}
-	else 
-	{
-		deleteElementFromList(a_piece, black);
 	}
 }
 

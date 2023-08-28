@@ -6,6 +6,13 @@ namespace Pieces
 {
 	std::vector<QPixmap> Piece::glob_ChessPiecesBitmap;
 
+	Piece::Piece(const Piece& other)
+		: m_column(other.m_column)
+		, m_row(other.m_row)
+		, m_color(other.m_color)
+	{
+	}
+
 	Piece::Piece(int a_col, int a_row, Color a_color)
 		: m_column(a_col)
 		, m_row(a_row)
@@ -25,7 +32,7 @@ namespace Pieces
 		};
 	}
 
-	bool Pawn::piece_moveable(int a_col, int a_row, const Chessgame& a_board) const
+	bool Pawn::piece_moveable(int a_col, int a_row, const Chessboard& a_board) const
 	{
 		int yMov = (m_color == Color::Black) ? 1 : -1;
 		// Move up
@@ -42,6 +49,11 @@ namespace Pieces
 				return a_board.pieceAt(a_col, a_row).get();
 		}
 		return false;
+	}
+
+	Piece* Pawn::clone() const
+	{
+		return new Pawn(*this);
 	}
 
 	Color Piece::getColor()
@@ -64,7 +76,7 @@ namespace Pieces
 		return this->m_column == a_col || this->m_row == a_row;
 	}
 
-	bool Piece::pieces_blocking(int a_col, int a_row, const Chessgame& a_board) const
+	bool Piece::pieces_blocking(int a_col, int a_row, const Chessboard& a_board) const
 	{
 		// Bei Bewegung auf Diagonalen/Reihe/Spalte ueberpruefen, ob was im Weg ist 
 		if (same_diagonale(a_col, a_row) || same_row_or_column(a_col, a_row))
@@ -97,10 +109,23 @@ namespace Pieces
 		return false;
 	}
 
-	bool Piece::abandons_king(int a_col, int a_row, Chessgame& a_board) const
+	bool Piece::abandons_king(int a_col, int a_row, Chessboard& a_board) const
 	{
-		auto allie_king = a_board.getKingFromList(m_color);		
-		auto enemy_pieces = a_board.getListOfColor((m_color == Color::Black) ? Color::White : Color::Black);
+		Chessboard copy = a_board;
+
+		auto this_piece = copy.pieceAt(m_column, m_row);
+		this_piece->m_column = a_col;
+		this_piece->m_row = a_row;
+		auto kingpos = copy.getKingFromList(this->m_color)->getBoardPos();
+		auto enemy_pieces = copy.getListOfColor((this->m_color == Color::White) ? Color::Black : Color::White);
+
+		for (auto enemy : enemy_pieces)
+		{
+			if (enemy->move_valid(kingpos.x(), kingpos.y(), copy))
+			{
+				return true;
+			}
+		}
 
 		return false;
 	}
@@ -111,17 +136,24 @@ namespace Pieces
 		this->m_row = a_row;
 	}
 
-	bool Piece::move_valid(int a_col, int a_row, Chessgame& a_board)
+	bool Piece::move_valid(int a_col, int a_row, Chessboard& a_board)
 	{
+#if 0
 		bool a, b, c, d;
 		a = !same_pos(a_col, a_row);
 		b = piece_moveable(a_col, a_row, a_board);
 		c = !pieces_blocking(a_col, a_row, a_board);
 		d = !abandons_king(a_col, a_row, a_board);
 		return a && b && c && d;
+#else
+		return !same_pos(a_col, a_row)
+			&& piece_moveable(a_col, a_row, a_board)
+			&& !pieces_blocking(a_col, a_row, a_board)
+			&& !abandons_king(a_col, a_row, a_board);
+#endif
 	}
 
-	QPointF Piece::getBoardPos() const
+	QPoint Piece::getBoardPos() const
 	{
 		return QPoint(m_column, m_row);
 	}
@@ -149,9 +181,14 @@ namespace Pieces
 		};
 	}
 
-	bool Rook::piece_moveable(int a_col, int a_row, const Chessgame& a_board) const
+	bool Rook::piece_moveable(int a_col, int a_row, const Chessboard& a_board) const
 	{
 		return same_row_or_column(a_col, a_row);
+	}
+
+	Piece* Rook::clone() const
+	{
+		return new Rook(*this);;
 	}
 
 	Knight::Knight(int a_col, int a_row, Color a_color)
@@ -171,13 +208,18 @@ namespace Pieces
 		};
 	}
 
-	bool Knight::piece_moveable(int a_col, int a_row, const Chessgame& a_board) const
+	bool Knight::piece_moveable(int a_col, int a_row, const Chessboard& a_board) const
 	{
 		int XMov = abs(a_col - m_column)
 			, yMov = abs(a_row - m_row);
 		bool a = (XMov + yMov == 3);
 		bool b = (abs(XMov - yMov) == 1);;
 		return a && b;
+	}
+
+	Piece* Knight::clone() const
+	{
+		return new Knight(*this);
 	}
 
 	Bishop::Bishop(int a_col, int a_row, Color a_color)
@@ -197,9 +239,14 @@ namespace Pieces
 		};
 	}
 
-	bool Bishop::piece_moveable(int a_col, int a_row, const Chessgame& a_board) const
+	bool Bishop::piece_moveable(int a_col, int a_row, const Chessboard& a_board) const
 	{
 		return same_diagonale(a_col, a_row);
+	}
+
+	Piece* Bishop::clone() const
+	{
+		return new Bishop(*this);
 	}
 
 	Queen::Queen(int a_col, int a_row, Color a_color)
@@ -219,9 +266,14 @@ namespace Pieces
 		};
 	}
 
-	bool Queen::piece_moveable(int a_col, int a_row, const Chessgame& a_board) const
+	bool Queen::piece_moveable(int a_col, int a_row, const Chessboard& a_board) const
 	{
 		return same_row_or_column(a_col, a_row) || same_diagonale(a_col, a_row);
+	}
+
+	Piece* Queen::clone() const
+	{
+		return new Queen(*this);
 	}
 
 	King::King(int a_col, int a_row, Color a_color)
@@ -241,9 +293,14 @@ namespace Pieces
 		};
 	}
 
-	bool King::piece_moveable(int a_col, int a_row, const Chessgame& a_board) const
+	bool King::piece_moveable(int a_col, int a_row, const Chessboard& a_board) const
 	{
 		return (abs(a_col - m_column) <= 1) && (abs(a_row - m_row) <= 1);
+	}
+
+	Piece* King::clone() const
+	{
+		return new King(*this);
 	}
 }
 
