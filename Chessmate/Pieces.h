@@ -9,14 +9,14 @@
 
 class ChessGame;
 
-enum class Color
-{
-	White,
-	Black
-};
-
 namespace Pieces
 {
+    enum class Color
+    {
+        White,
+        Black
+    };
+
 	struct Piece
 	{
 	public:
