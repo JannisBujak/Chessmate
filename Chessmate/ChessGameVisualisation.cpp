@@ -207,7 +207,7 @@ void ChessGameVisualisation::cleanPiece(std::shared_ptr<Pieces::Piece> a_piece)
 
 bool ChessGameVisualisation::isMoveable(std::shared_ptr<Pieces::Piece> a_piece)
 {
-    return m_ChessGame.isMoveable(a_piece);
+    return !m_ChessGame.gameOver() && m_ChessGame.isMoveable(a_piece);
 }
 
 

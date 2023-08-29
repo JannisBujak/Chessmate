@@ -16,7 +16,7 @@ class ChessGame : public QObject
 private:
     Pieces::Color m_playingColor;
     std::vector<std::shared_ptr<Pieces::Piece>> white, black;
-
+    bool m_bGameOver;
 public:
     ChessGame(QObject* parent = nullptr);
     ChessGame(const ChessGame&);
@@ -47,6 +47,8 @@ public:
     std::vector<std::shared_ptr<Pieces::Piece>> getListOfPieces();
 
     void checkForWin();
+    void endGame(Pieces::Color a_WinningColor);
+    bool gameOver() const;
     void confirmMove();
 
     void cleanPiece(std::shared_ptr<Pieces::Piece> a_piece);

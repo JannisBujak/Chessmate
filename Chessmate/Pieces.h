@@ -13,6 +13,7 @@ namespace Pieces
 {
     enum class Color
     {
+        None,
         White,
         Black
     };

@@ -7,12 +7,14 @@
 
 ChessGame::ChessGame(QObject* parent)
         : QObject(parent)
+        , m_bGameOver(false)
 {
     init();
 }
 
 ChessGame::ChessGame(const ChessGame& other)
         : m_playingColor(other.m_playingColor)
+        , m_bGameOver(false)
 {
     for (auto w : other.white)
         white.push_back(std::shared_ptr< Pieces::Piece>(w->clone()));
@@ -150,15 +152,17 @@ void ChessGame::checkForWin()
     if (!bk)
     {
         qDebug() << "No black King";
-        emit playerWon(Color::White);
+        endGame(Color::White);
     }
     else if (!wk)
     {
         qDebug() << "No white King";
-        emit playerWon(Color::Black);
+        endGame(Color::Black);
     }
     else
     {
+        // TODO: Check or stalemate
+
         Pieces::King* checked_king;
         std::vector<std::shared_ptr<Pieces::Piece>> opposing_pieces;
         // Check if players king is under Attack
@@ -175,6 +179,17 @@ void ChessGame::checkForWin()
             }
         }
     }
+}
+
+
+void ChessGame::endGame(Pieces::Color a_WinningColor)
+{
+    m_bGameOver = true;
+    emit  playerWon(a_WinningColor);
+}
+
+bool ChessGame::gameOver() const {
+    return m_bGameOver;
 }
 
 void ChessGame::confirmMove()
@@ -204,6 +219,7 @@ void ChessGame::init()
     using namespace Pieces;
     removeAllPieces();
     setPlayingColor(Color::White);
+    m_bGameOver = false;
 
     for (int x = 0; x < BOARD_WIDTH; ++x)
     {
@@ -214,3 +230,5 @@ void ChessGame::init()
     fillBackrow(Color::Black, 0);
     fillBackrow(Color::White, 7);
 }
+
+
