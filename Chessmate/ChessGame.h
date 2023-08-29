@@ -33,15 +33,17 @@ public:
 
     void fillBackrow(Pieces::Color a_color, int a_col);
     void removeAllPieces();
-    std::shared_ptr<Pieces::Piece> pieceAt(int x, int y) const;
+
+    std::shared_ptr<Pieces::Piece> pieceAt(int x, int y);
+    const std::shared_ptr<Pieces::Piece> pieceAt(int x, int y) const;
 
     bool isMoveable(std::shared_ptr<Pieces::Piece> a_piece);
 
     static Pieces::King* getKingFromList(std::vector < std::shared_ptr<Pieces::Piece>> a_ColoredPieces);
     Pieces::King* getKingFromList(Pieces::Color a_color);
 
-    const std::vector<std::shared_ptr<Pieces::Piece>> getListOfColor(Pieces::Color a_color) const;
-    std::vector<std::shared_ptr<Pieces::Piece>> getListOfColor(Pieces::Color a_color);
+    const std::vector<std::shared_ptr<Pieces::Piece>>& getListOfColor(Pieces::Color a_color) const;
+    std::vector<std::shared_ptr<Pieces::Piece>>& getListOfColor(Pieces::Color a_color);
     std::vector<std::shared_ptr<Pieces::Piece>> getListOfPieces();
 
     void checkForWin();

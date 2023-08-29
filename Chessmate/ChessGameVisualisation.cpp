@@ -51,7 +51,10 @@ void ChessGameVisualisation::removeAllPieces()
 }
 
 void ChessGameVisualisation::init()
-{	
+{
+    for(const auto& field : m_fields)
+        field->setPiece();
+    m_ChessGame.init();
 	auto pieces = m_ChessGame.getListOfPieces();
 	for (auto p : pieces)
 	{

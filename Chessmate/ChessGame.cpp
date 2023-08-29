@@ -64,7 +64,27 @@ bool ChessGame::isMoveable(std::shared_ptr<Pieces::Piece> a_piece)
     return playingColor() == pc;
 }
 
-std::shared_ptr<Pieces::Piece> ChessGame::pieceAt(int x, int y) const
+std::shared_ptr<Pieces::Piece> ChessGame::pieceAt(int x, int y)
+{
+    for (std::shared_ptr<Pieces::Piece> w : white)
+    {
+        if (w->same_pos(x, y))
+        {
+            return w;
+        }
+    }
+
+    for (std::shared_ptr<Pieces::Piece> b : black)
+    {
+        if (b->same_pos(x, y))
+        {
+            return b;
+        }
+    }
+    return std::shared_ptr<Pieces::Piece>();
+}
+
+const std::shared_ptr<Pieces::Piece> ChessGame::pieceAt(int x, int y) const
 {
     for (std::shared_ptr<Pieces::Piece> w : white)
     {
@@ -100,13 +120,13 @@ Pieces::King* ChessGame::getKingFromList(Pieces::Color a_color)
     return getKingFromList((a_color == Color::Black) ? black : white);
 }
 
-const std::vector<std::shared_ptr<Pieces::Piece>> ChessGame::getListOfColor(Pieces::Color a_color) const
+std::vector<std::shared_ptr<Pieces::Piece>>& ChessGame::getListOfColor(Pieces::Color a_color)
 {
     using namespace Pieces;
     return (a_color == Color::Black) ? black : white;
 }
 
-std::vector<std::shared_ptr<Pieces::Piece>> ChessGame::getListOfColor(Pieces::Color a_color)
+const std::vector<std::shared_ptr<Pieces::Piece>>& ChessGame::getListOfColor(Pieces::Color a_color) const
 {
     using namespace Pieces;
     return (a_color == Color::Black) ? black : white;

@@ -26,15 +26,14 @@ int main(int argc, char** argv)
     main_layout->addWidget(playingPartyText);
     auto inner_scene = new QGraphicsScene();
 
-    auto chessgame = new ChessGameVisualisation(inner_scene);
-    main_layout->addWidget(chessgame);
+    auto pChessGameVisualisation = new ChessGameVisualisation(inner_scene);
+    main_layout->addWidget(pChessGameVisualisation);
 
-
-    app->connect(chessgame->getChessGame(), &ChessGame::playingColorChanged, [&](Color a_color)
+    app->connect(pChessGameVisualisation->getChessGame(), &ChessGame::playingColorChanged, [&](Color a_color)
         {
             playingPartyText->setText(QString("%1 team playing").arg(a_color == Color::White ? QString("White") : QString("Black")));
         });
-    app->connect(chessgame->getChessGame(), &ChessGame::playerWon, [&](Color a_color)
+    app->connect(pChessGameVisualisation->getChessGame(), &ChessGame::playerWon, [&](Color a_color)
         {
             playingPartyText->setText(QString("Player %1 won").arg(a_color == Color::White ? QString("white") : QString("black")));
         });
@@ -42,9 +41,9 @@ int main(int argc, char** argv)
     auto restartGameButton = new QPushButton("Restart");
     main_layout->addWidget(restartGameButton);
 
-    app->connect(restartGameButton, &QPushButton::clicked, chessgame, &ChessGameVisualisation::init);
+    app->connect(restartGameButton, &QPushButton::clicked, pChessGameVisualisation, &ChessGameVisualisation::init);
 
-    chessgame->init();
+    pChessGameVisualisation->init();
 
     // outer_view->setBaseSize(QSize(960, 540));
     outer_view->resize(QSize(1920, 1080));

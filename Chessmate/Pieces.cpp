@@ -116,17 +116,31 @@ namespace Pieces
 		auto this_piece = copy.pieceAt(m_column, m_row);
 		this_piece->m_column = a_col;
 		this_piece->m_row = a_row;
-		auto kingpos = copy.getKingFromList(this->m_color)->getBoardPos();
-		auto enemy_pieces = copy.getListOfColor((this->m_color == Color::White) ? Color::Black : Color::White);
 
-		for (auto enemy : enemy_pieces)
+        auto king = copy.getKingFromList(this->m_color);
+        if(!king)
+            return true;
+
+        auto kingPos = king->getBoardPos();
+
+        auto& enemy_pieces = copy.getListOfColor((this->m_color == Color::White) ? Color::Black : Color::White);
+
+        for ( auto it = enemy_pieces.begin(); it != enemy_pieces.end(); ++it)
+        {
+            if(it->get()->same_pos(a_col, a_row))
+            {
+                enemy_pieces.erase(it);
+                break;
+            }
+        }
+
+		for (const auto& enemy : enemy_pieces)
 		{
-			if (enemy->move_valid(kingpos.x(), kingpos.y(), copy))
+			if (enemy->move_valid(kingPos.x(), kingPos.y(), copy))
 			{
 				return true;
 			}
 		}
-
 		return false;
 	}
 
