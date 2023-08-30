@@ -163,7 +163,7 @@ namespace Pieces
 		return !same_pos(a_col, a_row)
 			&& piece_moveable(a_col, a_row, a_board)
 			&& !pieces_blocking(a_col, a_row, a_board)
-			&& !abandons_king(a_col, a_row, a_board, level);
+			&& !abandons_king(a_col, a_row, a_board);
 #endif
 	}
 
