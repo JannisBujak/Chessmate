@@ -6,12 +6,12 @@
 
 #include "Pieces.h"
 
-class Chessgame;
+class ChessGameVisualisation;
 
 class ChessboardField : public QGraphicsRectItem
 {
 private:
-	Chessgame* m_chessgame;	
+	ChessGameVisualisation* m_chessgame;
 	char m_column, m_row;
 	
 	std::shared_ptr<Pieces::Piece> m_piece;
@@ -21,7 +21,7 @@ private:
 	std::unique_ptr<QGraphicsPixmapItem> m_draggedPiece;
 
 public:
-	ChessboardField(char x, char y, Chessgame* a_chessgame);
+	ChessboardField(char x, char y, ChessGameVisualisation* a_chessgame);
 	QString getText();
 
 	void updateDraggedPos(QGraphicsSceneMouseEvent* event);

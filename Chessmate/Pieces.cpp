@@ -1,6 +1,6 @@
 #include "Pieces.h"
 
-#include "Chessgame.h"
+#include "ChessGameVisualisation.h"
 
 namespace Pieces
 {
@@ -32,7 +32,7 @@ namespace Pieces
 		};
 	}
 
-	bool Pawn::piece_moveable(int a_col, int a_row, const Chessboard& a_board) const
+	bool Pawn::piece_moveable(int a_col, int a_row, const ChessGame& a_board) const
 	{
 		int yMov = (m_color == Color::Black) ? 1 : -1;
 		// Move up
@@ -76,7 +76,7 @@ namespace Pieces
 		return this->m_column == a_col || this->m_row == a_row;
 	}
 
-	bool Piece::pieces_blocking(int a_col, int a_row, const Chessboard& a_board) const
+	bool Piece::pieces_blocking(int a_col, int a_row, const ChessGame& a_board) const
 	{
 		// Bei Bewegung auf Diagonalen/Reihe/Spalte ueberpruefen, ob was im Weg ist 
 		if (same_diagonale(a_col, a_row) || same_row_or_column(a_col, a_row))
@@ -109,39 +109,38 @@ namespace Pieces
 		return false;
 	}
 
-	bool Piece::abandons_king(int a_col, int a_row, const Chessboard& a_board, int level) const
+	bool Piece::abandons_king(int a_col, int a_row, ChessGame& a_board) const
 	{
-		if (level >= 1)
-		{
-			return false;
-		}
-		Chessboard copy = a_board;
+		ChessGame copy = a_board;
 
 		auto this_piece = copy.pieceAt(m_column, m_row);
 		this_piece->m_column = a_col;
 		this_piece->m_row = a_row;
-		
-		// Remove taken piece 
-		auto taken_piece = copy.pieceAt(a_col, a_row);
-		if (taken_piece)
-			copy.cleanPiece(taken_piece);
-		
-		auto ally_king = copy.getKingFromList(this->m_color);
-		if (!ally_king)
-			return true;
 
-		auto kingpos = ally_king->getBoardPos();		
-		auto enemy_pieces = copy.getListOfColor((this->m_color == Color::White) ? Color::Black : Color::White);
-		
-		for (auto enemy : enemy_pieces)
+        auto king = copy.getKingFromList(this->m_color);
+        if(!king)
+            return true;
+
+        auto kingPos = king->getBoardPos();
+
+        auto& enemy_pieces = copy.getListOfColor((this->m_color == Color::White) ? Color::Black : Color::White);
+
+        for ( auto it = enemy_pieces.begin(); it != enemy_pieces.end(); ++it)
+        {
+            if(it->get()->same_pos(a_col, a_row))
+            {
+                enemy_pieces.erase(it);
+                break;
+            }
+        }
+
+		for (const auto& enemy : enemy_pieces)
 		{
-
-			if (enemy->move_valid(kingpos.x(), kingpos.y(), copy, level+1))
+			if (enemy->move_valid(kingPos.x(), kingPos.y(), copy))
 			{
 				return true;
 			}
 		}
-
 		return false;
 	}
 
@@ -151,7 +150,7 @@ namespace Pieces
 		this->m_row = a_row;
 	}
 
-	bool Piece::move_valid(int a_col, int a_row, const Chessboard& a_board, int level)
+	bool Piece::move_valid(int a_col, int a_row, ChessGame& a_board)
 	{
 #if 0
 		bool a, b, c, d;
@@ -196,7 +195,7 @@ namespace Pieces
 		};
 	}
 
-	bool Rook::piece_moveable(int a_col, int a_row, const Chessboard& a_board) const
+	bool Rook::piece_moveable(int a_col, int a_row, const ChessGame& a_board) const
 	{
 		return same_row_or_column(a_col, a_row);
 	}
@@ -223,7 +222,7 @@ namespace Pieces
 		};
 	}
 
-	bool Knight::piece_moveable(int a_col, int a_row, const Chessboard& a_board) const
+	bool Knight::piece_moveable(int a_col, int a_row, const ChessGame& a_board) const
 	{
 		int XMov = abs(a_col - m_column)
 			, yMov = abs(a_row - m_row);
@@ -254,7 +253,7 @@ namespace Pieces
 		};
 	}
 
-	bool Bishop::piece_moveable(int a_col, int a_row, const Chessboard& a_board) const
+	bool Bishop::piece_moveable(int a_col, int a_row, const ChessGame& a_board) const
 	{
 		return same_diagonale(a_col, a_row);
 	}
@@ -281,7 +280,7 @@ namespace Pieces
 		};
 	}
 
-	bool Queen::piece_moveable(int a_col, int a_row, const Chessboard& a_board) const
+	bool Queen::piece_moveable(int a_col, int a_row, const ChessGame& a_board) const
 	{
 		return same_row_or_column(a_col, a_row) || same_diagonale(a_col, a_row);
 	}
@@ -308,7 +307,7 @@ namespace Pieces
 		};
 	}
 
-	bool King::piece_moveable(int a_col, int a_row, const Chessboard& a_board) const
+	bool King::piece_moveable(int a_col, int a_row, const ChessGame& a_board) const
 	{
 		return (abs(a_col - m_column) <= 1) && (abs(a_row - m_row) <= 1);
 	}

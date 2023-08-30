@@ -7,16 +7,17 @@
 #include <QLabel>
 #include <QDebug>
 
-class Chessboard;
-
-enum class Color
-{
-	White,
-	Black
-};
+class ChessGame;
 
 namespace Pieces
 {
+    enum class Color
+    {
+        None,
+        White,
+        Black
+    };
+
 	struct Piece
 	{
 	public:
@@ -33,7 +34,7 @@ namespace Pieces
 		virtual QPixmap& get_pxmap() = 0;
 
 	protected:
-		virtual bool piece_moveable(int a_col, int a_row, const Chessboard& a_board) const = 0;
+		virtual bool piece_moveable(int a_col, int a_row, const ChessGame& a_board) const = 0;
 
 	public:
 		Color getColor();
@@ -43,11 +44,11 @@ namespace Pieces
 		bool same_diagonale(int a_col, int a_row) const;
 		bool same_row_or_column(int a_col, int a_row) const;
 
-		bool pieces_blocking(int a_col, int a_row, const Chessboard& a_board) const;
-		bool abandons_king(int a_col, int a_row, const Chessboard& a_board, int level) const;
+		bool pieces_blocking(int a_col, int a_row, const ChessGame& a_board) const;
+		bool abandons_king(int a_col, int a_row, ChessGame& a_board) const;
 
 		void updatePosition(int a_col, int a_row);
-		bool move_valid(int a_col, int a_row, const Chessboard& a_board, int level = 0);
+		bool move_valid(int a_col, int a_row, ChessGame& a_board);
 
 		QPoint getBoardPos() const;
 
@@ -60,7 +61,7 @@ namespace Pieces
 		Pawn(int a_col, int a_row, Color a_color);
 
 		virtual QPixmap& get_pxmap() override;
-		bool piece_moveable(int a_col, int a_row, const Chessboard& a_board) const override;
+		bool piece_moveable(int a_col, int a_row, const ChessGame& a_board) const override;
 
 		virtual Piece* clone() const;
 	};
@@ -71,7 +72,7 @@ namespace Pieces
 		Rook(int a_col, int a_row, Color a_color);
 
 		virtual QPixmap& get_pxmap() override;
-		bool piece_moveable(int a_col, int a_row, const Chessboard& a_board) const override;
+		bool piece_moveable(int a_col, int a_row, const ChessGame& a_board) const override;
 
 		virtual Piece* clone() const;
 	};
@@ -81,7 +82,7 @@ namespace Pieces
 		Knight(int a_col, int a_row, Color a_color);
 
 		virtual QPixmap& get_pxmap() override;
-		bool piece_moveable(int a_col, int a_row, const Chessboard& a_board) const override;
+		bool piece_moveable(int a_col, int a_row, const ChessGame& a_board) const override;
 
 		virtual Piece* clone() const;
 	};
@@ -91,7 +92,7 @@ namespace Pieces
 		Bishop(int a_col, int a_row, Color a_color);
 
 		virtual QPixmap& get_pxmap() override;
-		bool piece_moveable(int a_col, int a_row, const Chessboard& a_board) const override;
+		bool piece_moveable(int a_col, int a_row, const ChessGame& a_board) const override;
 
 		virtual Piece* clone() const;
 	};
@@ -101,7 +102,7 @@ namespace Pieces
 		Queen(int a_col, int a_row, Color a_color);
 
 		virtual QPixmap& get_pxmap() override;
-		bool piece_moveable(int a_col, int a_row, const Chessboard& a_board) const override;
+		bool piece_moveable(int a_col, int a_row, const ChessGame& a_board) const override;
 
 		virtual Piece* clone() const;
 	};
@@ -111,7 +112,7 @@ namespace Pieces
 		King(int a_col, int a_row, Color a_color);
 
 		virtual QPixmap& get_pxmap() override;
-		bool piece_moveable(int a_col, int a_row, const Chessboard& a_board) const override;
+		bool piece_moveable(int a_col, int a_row, const ChessGame& a_board) const override;
 
 		virtual Piece* clone() const;
 	};

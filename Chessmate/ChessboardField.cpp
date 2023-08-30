@@ -1,11 +1,11 @@
 
 #include "ChessboardField.h"
 
-#include "Chessgame.h"
+#include "ChessGameVisualisation.h"
 #include <QGraphicsSceneMouseEvent>
 #include <cmath>
 
-ChessboardField::ChessboardField(char a_column, char a_row, Chessgame* a_chessgame)
+ChessboardField::ChessboardField(char a_column, char a_row, ChessGameVisualisation* a_chessgame)
 	: m_chessgame(a_chessgame)
 	, m_column(a_column)
 	, m_row(a_row)

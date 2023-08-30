@@ -8,13 +8,15 @@
 using namespace std;
 
 int main(int argc, char** argv)
-{	
-	// QT-Game-UI
-	auto app = new QApplication(argc, argv);
+{
+    using namespace Pieces;
 
-	// Chess-stuff
+    // QT-Game-UI
+    auto app = new QApplication(argc, argv);
 
-	auto outer_scene = new QGraphicsScene(app);
+    // Chess-stuff
+
+    auto outer_scene = new QGraphicsScene(app);
     auto outer_view = new QGraphicsView (outer_scene);
 
     auto main_layout = new QVBoxLayout();
@@ -23,15 +25,15 @@ int main(int argc, char** argv)
     auto playingPartyText = new QLabel();
     main_layout->addWidget(playingPartyText);
     auto inner_scene = new QGraphicsScene();
-    
-    auto chessgame = new Chessgame(inner_scene);
-    main_layout->addWidget(chessgame);
-    
-    app->connect(chessgame, &Chessgame::playingColorChanged, [&](Color a_color)
+
+    auto pChessGameVisualisation = new ChessGameVisualisation(inner_scene);
+    main_layout->addWidget(pChessGameVisualisation);
+
+    app->connect(pChessGameVisualisation->getChessGame(), &ChessGame::playingColorChanged, [&](Color a_color)
         {
             playingPartyText->setText(QString("%1 team playing").arg(a_color == Color::White ? QString("White") : QString("Black")));
         });
-    app->connect(chessgame, &Chessgame::playerWon, [&](Color a_color)
+    app->connect(pChessGameVisualisation->getChessGame(), &ChessGame::playerWon, [&](Color a_color)
         {
             playingPartyText->setText(QString("Player %1 won").arg(a_color == Color::White ? QString("white") : QString("black")));
         });
@@ -39,9 +41,9 @@ int main(int argc, char** argv)
     auto restartGameButton = new QPushButton("Restart");
     main_layout->addWidget(restartGameButton);
 
-    app->connect(restartGameButton, &QPushButton::clicked, chessgame, &Chessgame::init);
+    app->connect(restartGameButton, &QPushButton::clicked, pChessGameVisualisation, &ChessGameVisualisation::init);
 
-    chessgame->init();
+    pChessGameVisualisation->init();
 
     // outer_view->setBaseSize(QSize(960, 540));
     outer_view->resize(QSize(1920, 1080));
