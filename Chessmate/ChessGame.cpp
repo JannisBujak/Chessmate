@@ -31,7 +31,7 @@ Pieces::Color ChessGame::playingColor()
 void ChessGame::togglePlayingColor()
 {
     using namespace Pieces;
-    setPlayingColor((playingColor() == Color::Black) ? Color::White : Color::Black);
+    setPlayingColor(oppositeColor(playingColor()));
 }
 
 void ChessGame::setPlayingColor(Pieces::Color a_playingColor)
@@ -147,7 +147,7 @@ void ChessGame::checkForWin()
     using namespace Pieces;
     // First get the two kings
     Pieces::King* bk = getKingFromList(black)
-    , * wk = getKingFromList(white);
+        , * wk = getKingFromList(white);
     Q_ASSERT(bk || wk);
     if (!bk)
     {
@@ -163,24 +163,14 @@ void ChessGame::checkForWin()
     {
         // TODO: Check or stalemate
 
-        Pieces::King* checked_king;
-        std::vector<std::shared_ptr<Pieces::Piece>> opposing_pieces;
+        Pieces::King* checked_king = getKingFromList(m_playingColor);
+        std::vector<std::shared_ptr<Pieces::Piece>> opposing_pieces = getListOfColor(oppositeColor(m_playingColor));
         // Check if players king is under Attack
-        checked_king = (m_playingColor == Color::White) ? wk : bk;
-        opposing_pieces = (m_playingColor == Color::White) ? black : white;
-
-        auto kingPos = checked_king->getBoardPos();
-
-        for (auto opposing_piece : opposing_pieces)
-        {
-            if (opposing_piece->move_valid(kingPos.x(), kingPos.y(), *this))
-            {
-                qDebug() << ((m_playingColor == Color::White) ? QString("White") : QString("Black")) << "King checked";
-            }
+        if(checked_king->isAttacked(*this)) {
+            qDebug() << ((m_playingColor == Color::White) ? QString("White") : QString("Black")) << "King checked";
         }
     }
 }
-
 
 void ChessGame::endGame(Pieces::Color a_WinningColor)
 {

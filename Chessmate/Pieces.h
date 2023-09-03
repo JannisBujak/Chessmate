@@ -18,6 +18,8 @@ namespace Pieces
         Black
     };
 
+    Color oppositeColor(Color a_color);
+
 	struct Piece
 	{
 	public:
@@ -25,9 +27,10 @@ namespace Pieces
 
 	protected:
 		int m_column, m_row;
+        int m_timesMoved;
 		Color m_color;
 	protected:
-		Piece(const Piece& other);
+		Piece(const Piece& other) = default;
 		Piece(int a_col, int a_row, Color a_color);
 
 	public:
@@ -37,20 +40,22 @@ namespace Pieces
 		virtual bool piece_moveable(int a_col, int a_row, const ChessGame& a_board) const = 0;
 
 	public:
-		Color getColor();
+		Color getColor() const;
+        int timesMoved() const;
 
-		bool same_pos(int a_col, int a_row);
+		bool same_pos(int a_col, int a_row) const;
 
 		bool same_diagonale(int a_col, int a_row) const;
 		bool same_row_or_column(int a_col, int a_row) const;
 
 		bool pieces_blocking(int a_col, int a_row, const ChessGame& a_board) const;
-		bool abandons_king(int a_col, int a_row, ChessGame& a_board) const;
+		bool abandons_king(int a_col, int a_row, const ChessGame& a_board) const;
 
 		void updatePosition(int a_col, int a_row);
-		bool move_valid(int a_col, int a_row, ChessGame& a_board);
+		bool move_valid(int a_col, int a_row, const ChessGame& a_board);
+		bool isAttacked(const ChessGame& a_board) const;
 
-		QPoint getBoardPos() const;
+        QPoint getBoardPos() const;
 
 		virtual Piece* clone() const = 0;
 	};

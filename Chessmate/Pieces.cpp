@@ -4,18 +4,25 @@
 
 namespace Pieces
 {
-	std::vector<QPixmap> Piece::glob_ChessPiecesBitmap;
+    Color oppositeColor(Color a_color)
+    {
+        switch(a_color)
+        {
+            case Color::Black:
+                return Color::White;
+            case Color::White:
+                return Color::Black;
+            default:
+                return Color::None;
+        }
+    }
 
-	Piece::Piece(const Piece& other)
-		: m_column(other.m_column)
-		, m_row(other.m_row)
-		, m_color(other.m_color)
-	{
-	}
+	std::vector<QPixmap> Piece::glob_ChessPiecesBitmap;
 
 	Piece::Piece(int a_col, int a_row, Color a_color)
 		: m_column(a_col)
 		, m_row(a_row)
+        , m_timesMoved(0)
 		, m_color(a_color)
 	{
 	}
@@ -29,7 +36,7 @@ namespace Pieces
 		case  Color::Black:
 		default:
 			return glob_ChessPiecesBitmap[11];
-		};
+		}
 	}
 
 	bool Pawn::piece_moveable(int a_col, int a_row, const ChessGame& a_board) const
@@ -45,8 +52,21 @@ namespace Pieces
 		}
 		else if (abs(m_column - a_col) == 1)
 		{
+            Pieces::Pawn* p;
 			if (a_row == m_row + yMov)
-				return a_board.pieceAt(a_col, a_row).get();
+            {
+                if (a_board.pieceAt(a_col, a_row).get())
+                {
+                    return true;
+                }
+                else if ((p = dynamic_cast<Pieces::Pawn*>(a_board.pieceAt(a_col, m_row).get())) && (m_color != p->getColor()))
+                {
+                    // en passant counter
+                    bool b = (p->timesMoved() == 1) && (abs(p->m_row - p->m_origRow) >= 2);
+                    return b;
+                }
+
+            }
 		}
 		return false;
 	}
@@ -56,12 +76,17 @@ namespace Pieces
 		return new Pawn(*this);
 	}
 
-	Color Piece::getColor()
+	Color Piece::getColor() const
 	{
 		return m_color;
 	}
 
-	bool Piece::same_pos(int a_col, int a_row)
+    int Piece::timesMoved() const
+    {
+        return m_timesMoved;
+    }
+
+	bool Piece::same_pos(int a_col, int a_row) const
 	{
 		return this->m_column == a_col && this->m_row == a_row;
 	}
@@ -97,7 +122,8 @@ namespace Pieces
 
 		// Nur beim Springer moeglich und der kann immer 
 		std::shared_ptr<Piece> piece;
-		if (piece = a_board.pieceAt(a_col, a_row))
+        piece = a_board.pieceAt(a_col, a_row);
+        if (piece)
 		{
 			if (piece->m_color == m_color)
 			{
@@ -109,7 +135,7 @@ namespace Pieces
 		return false;
 	}
 
-	bool Piece::abandons_king(int a_col, int a_row, ChessGame& a_board) const
+	bool Piece::abandons_king(int a_col, int a_row, const ChessGame& a_board) const
 	{
 		ChessGame copy = a_board;
 
@@ -123,7 +149,7 @@ namespace Pieces
 
         auto kingPos = king->getBoardPos();
 
-        auto& enemy_pieces = copy.getListOfColor((this->m_color == Color::White) ? Color::Black : Color::White);
+        auto& enemy_pieces = copy.getListOfColor(oppositeColor(m_color));
 
         for ( auto it = enemy_pieces.begin(); it != enemy_pieces.end(); ++it)
         {
@@ -148,9 +174,10 @@ namespace Pieces
 	{
 		this->m_column = a_col;
 		this->m_row = a_row;
+        this->m_timesMoved++;
 	}
 
-	bool Piece::move_valid(int a_col, int a_row, ChessGame& a_board)
+	bool Piece::move_valid(int a_col, int a_row, const ChessGame& a_board)
 	{
 #if 0
 		bool a, b, c, d;
@@ -172,7 +199,18 @@ namespace Pieces
 		return QPoint(m_column, m_row);
 	}
 
-	Pawn::Pawn(int a_col, int a_row, Color a_color)
+    bool Piece::isAttacked(const ChessGame& a_board) const {
+        auto oc = oppositeColor(m_color);
+        const auto& enemyPieces = a_board.getListOfColor(oc);
+        for(const auto& enemyPiece : enemyPieces)
+        {
+            if(enemyPiece->move_valid(m_column, m_row, a_board))
+                return true;
+        }
+        return false;
+    }
+
+    Pawn::Pawn(int a_col, int a_row, Color a_color)
 		: Piece(a_col, a_row, a_color)
 		, m_origRow(a_row)
 	{
@@ -192,7 +230,7 @@ namespace Pieces
 		case  Color::Black:
 		default:
 			return glob_ChessPiecesBitmap[8];
-		};
+		}
 	}
 
 	bool Rook::piece_moveable(int a_col, int a_row, const ChessGame& a_board) const
