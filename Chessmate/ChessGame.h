@@ -21,6 +21,8 @@ public:
     ChessGame(QObject* parent = nullptr);
     ChessGame(const ChessGame&);
 
+    static QString chessposToString(QPoint a_point);
+
     struct History
     {
         QString piece_type;
@@ -33,6 +35,14 @@ public:
             , from(from)
             , to(to)
         {}
+
+        operator QString() const
+        {
+            return QString("%1%2-%3")
+                .arg(piece_type)
+                .arg(chessposToString(from))
+                .arg(chessposToString(to));
+        }
     };
 
 private:

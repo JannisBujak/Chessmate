@@ -52,7 +52,6 @@ public:
 	ChessboardField* display_field(int x, int y, const QRectF& a_rect);
 	void display_label(int x, int y, const QRectF& a_rect, const QPixmap& a_pxmp);
 	void display();
-	void print();
 
 	void markLegalMoves(std::shared_ptr<Pieces::Piece> a_piece);
 	void markNoMoves();

@@ -16,7 +16,7 @@ ChessboardField::ChessboardField(char a_column, char a_row, ChessGameVisualisati
 
 QString ChessboardField::getText()
 {
-	return QString().asprintf("%c%d", 'A'+m_column, 1+m_row);
+	return ChessGame::chessposToString(QPoint(m_column, m_row));
 }
 
 void ChessboardField::updateDraggedPos(QGraphicsSceneMouseEvent* event)

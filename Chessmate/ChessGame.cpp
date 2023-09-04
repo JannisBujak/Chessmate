@@ -23,6 +23,11 @@ ChessGame::ChessGame(const ChessGame& other)
         black.push_back(std::shared_ptr<Pieces::Piece>(b->clone()));
 }
 
+QString ChessGame::chessposToString(QPoint a_point)
+{
+    return QString().asprintf("%c%d", 'A' + a_point.x(), BOARD_HEIGHT - a_point.y());
+}
+
 const std::vector<ChessGame::History>& ChessGame::getHistory() const
 {
     return m_history;
@@ -190,6 +195,8 @@ bool ChessGame::gameOver() const {
 void ChessGame::confirmMove(ChessGame::History a_history)
 {
     m_history.push_back(a_history);
+    qDebug() << m_history.back();
+
     // Toggles playing color
     togglePlayingColor();
 
