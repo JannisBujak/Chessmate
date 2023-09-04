@@ -21,6 +21,25 @@ public:
     ChessGame(QObject* parent = nullptr);
     ChessGame(const ChessGame&);
 
+    struct History
+    {
+        QString piece_type;
+        Pieces::Color color;
+        QPoint from, to;
+
+        History(std::shared_ptr<Pieces::Piece> piece, QPoint from, QPoint to)
+            : piece_type(piece->piece_name())
+            , color(piece->getColor())
+            , from(from)
+            , to(to)
+        {}
+    };
+
+private:
+    std::vector<History> m_history;
+public:
+    const std::vector<History>& getHistory() const;
+
     template <typename T>
     void addPiece(Pieces::Color a_color, int a_col, int a_row);
 
@@ -49,7 +68,7 @@ public:
     void checkForWin();
     void endGame(Pieces::Color a_WinningColor);
     bool gameOver() const;
-    void confirmMove();
+    void confirmMove(ChessGame::History a_history);
 
     void cleanPiece(std::shared_ptr<Pieces::Piece> a_piece);
 

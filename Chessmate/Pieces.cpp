@@ -27,6 +27,11 @@ namespace Pieces
 	{
 	}
 
+	QString Pawn::piece_name() const
+	{
+		return "Pawn";
+	}
+
 	QPixmap& Pawn::get_pxmap()
 	{
 		switch (m_color)
@@ -39,7 +44,29 @@ namespace Pieces
 		}
 	}
 
-	bool Pawn::piece_moveable(int a_col, int a_row, const ChessGame& a_board) const
+	bool Pawn::en_passant_counter_possible(int a_col, int a_row, const ChessGame& a_board, std::shared_ptr<QPoint>* a_beatenPoint) const 
+	{
+		Pieces::Pawn* p;
+		if ((p = dynamic_cast<Pieces::Pawn*>(a_board.pieceAt(a_col, m_row).get())) && (m_color != p->getColor()))
+		{
+			// en passant counter
+			if ((p->timesMoved() == 1) && (abs(p->m_row - p->m_origRow) >= 2))
+			{
+				// Check if last move was to QPoint(a_col, m_row), En passant-counter is only available for 1 round
+				auto history = a_board.getHistory();
+				bool en_passant_counter_possible = !history.empty() && history.back().to == QPoint(a_col, m_row);
+				if (en_passant_counter_possible)
+				{
+					if (a_beatenPoint)
+						a_beatenPoint->reset(new QPoint(a_col, m_row));
+				}
+				return en_passant_counter_possible;
+			}
+		}
+		return false;
+	}
+
+	bool Pawn::piece_moveable(int a_col, int a_row, const ChessGame& a_board, std::shared_ptr<QPoint>* a_beatenPoint) const
 	{
 		int yMov = (m_color == Color::Black) ? 1 : -1;
 		// Move up
@@ -59,13 +86,11 @@ namespace Pieces
                 {
                     return true;
                 }
-                else if ((p = dynamic_cast<Pieces::Pawn*>(a_board.pieceAt(a_col, m_row).get())) && (m_color != p->getColor()))
+                else if (en_passant_counter_possible(a_col, a_row, a_board, a_beatenPoint))
                 {
                     // en passant counter
-                    bool b = (p->timesMoved() == 1) && (abs(p->m_row - p->m_origRow) >= 2);
-                    return b;
+					return true;
                 }
-
             }
 		}
 		return false;
@@ -177,21 +202,12 @@ namespace Pieces
         this->m_timesMoved++;
 	}
 
-	bool Piece::move_valid(int a_col, int a_row, const ChessGame& a_board)
+	bool Piece::move_valid(int a_col, int a_row, const ChessGame& a_board, std::shared_ptr<QPoint>* a_beatenPoint)
 	{
-#if 0
-		bool a, b, c, d;
-		a = !same_pos(a_col, a_row);
-		b = piece_moveable(a_col, a_row, a_board);
-		c = !pieces_blocking(a_col, a_row, a_board);
-		d = !abandons_king(a_col, a_row, a_board);
-		return a && b && c && d;
-#else
 		return !same_pos(a_col, a_row)
-			&& piece_moveable(a_col, a_row, a_board)
+			&& piece_moveable(a_col, a_row, a_board, a_beatenPoint)
 			&& !pieces_blocking(a_col, a_row, a_board)
 			&& !abandons_king(a_col, a_row, a_board);
-#endif
 	}
 
 	QPoint Piece::getBoardPos() const
@@ -221,6 +237,11 @@ namespace Pieces
 	{
 	}
 
+	QString Rook::piece_name() const
+	{
+		return "Rook";
+	}
+
 	QPixmap& Rook::get_pxmap()
 	{
 		switch (m_color)
@@ -233,7 +254,7 @@ namespace Pieces
 		}
 	}
 
-	bool Rook::piece_moveable(int a_col, int a_row, const ChessGame& a_board) const
+	bool Rook::piece_moveable(int a_col, int a_row, const ChessGame& a_board, std::shared_ptr<QPoint>* a_beatenPoint) const
 	{
 		return same_row_or_column(a_col, a_row);
 	}
@@ -248,6 +269,11 @@ namespace Pieces
 	{
 	}
 
+	QString Knight::piece_name() const
+	{
+		return "Knight";
+	}
+
 	QPixmap& Knight::get_pxmap()
 	{
 		switch (m_color)
@@ -260,7 +286,7 @@ namespace Pieces
 		};
 	}
 
-	bool Knight::piece_moveable(int a_col, int a_row, const ChessGame& a_board) const
+	bool Knight::piece_moveable(int a_col, int a_row, const ChessGame& a_board, std::shared_ptr<QPoint>* a_beatenPoint) const
 	{
 		int XMov = abs(a_col - m_column)
 			, yMov = abs(a_row - m_row);
@@ -279,6 +305,11 @@ namespace Pieces
 	{
 	}
 
+	QString Bishop::piece_name() const
+	{
+		return "Bishop";
+	}
+
 	QPixmap& Bishop::get_pxmap()
 	{
 		switch (m_color)
@@ -291,7 +322,7 @@ namespace Pieces
 		};
 	}
 
-	bool Bishop::piece_moveable(int a_col, int a_row, const ChessGame& a_board) const
+	bool Bishop::piece_moveable(int a_col, int a_row, const ChessGame& a_board, std::shared_ptr<QPoint>* a_beatenPoint) const
 	{
 		return same_diagonale(a_col, a_row);
 	}
@@ -306,6 +337,11 @@ namespace Pieces
 	{
 	}
 
+	QString Queen::piece_name() const
+	{
+		return "Queen";
+	}
+
 	QPixmap& Queen::get_pxmap()
 	{
 		switch (m_color)
@@ -318,7 +354,7 @@ namespace Pieces
 		};
 	}
 
-	bool Queen::piece_moveable(int a_col, int a_row, const ChessGame& a_board) const
+	bool Queen::piece_moveable(int a_col, int a_row, const ChessGame& a_board, std::shared_ptr<QPoint>* a_beatenPoint) const
 	{
 		return same_row_or_column(a_col, a_row) || same_diagonale(a_col, a_row);
 	}
@@ -333,6 +369,11 @@ namespace Pieces
 	{
 	}
 
+	QString King::piece_name() const
+	{
+		return "King";
+	}
+
 	QPixmap& King::get_pxmap()
 	{
 		switch (m_color)
@@ -345,7 +386,7 @@ namespace Pieces
 		};
 	}
 
-	bool King::piece_moveable(int a_col, int a_row, const ChessGame& a_board) const
+	bool King::piece_moveable(int a_col, int a_row, const ChessGame& a_board, std::shared_ptr<QPoint>* a_beatenPoint) const
 	{
 		return (abs(a_col - m_column) <= 1) && (abs(a_row - m_row) <= 1);
 	}

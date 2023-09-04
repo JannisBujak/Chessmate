@@ -67,6 +67,8 @@ void ChessboardField::cleanPiece()
 	if (m_piece)
 	{
 		m_chessgame->cleanPiece(m_piece);
+		m_piece.reset();		
+		this->show();
 	}
 }
 
@@ -83,6 +85,11 @@ void ChessboardField::paint(QPainter* painter, const QStyleOptionGraphicsItem* o
 		}
 		m_pxmapItem->setPixmap(pixmap.scaled(bounding.size().toSize()));
 		m_pxmapItem->setPos(bounding.topLeft());
+		m_pxmapItem->show();
+	}
+	else if(m_pxmapItem)
+	{
+		m_pxmapItem->hide();
 	}
 	QGraphicsRectItem::paint(painter, option, widget);
 }

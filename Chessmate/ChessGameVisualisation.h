@@ -19,6 +19,8 @@
 #include "ChessboardField.h"
 #include "Pieces.h"
 
+#define MARK_MOVES true
+
 /*Drawing the playing-field here*/
 class ChessGameVisualisation : public QGraphicsView
 {
@@ -43,9 +45,8 @@ public slots:
 	void init();
 
 public:
-	std::shared_ptr<Pieces::Piece> pieceAt(int x, int y) const;
-
 	ChessboardField* fieldAt(int x, int y);
+	ChessboardField* fieldAt(QPoint point);
 
 	ChessboardField* fieldAtScenePos(QPointF a_scPos);
 	ChessboardField* display_field(int x, int y, const QRectF& a_rect);

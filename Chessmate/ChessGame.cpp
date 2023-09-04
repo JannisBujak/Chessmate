@@ -23,6 +23,11 @@ ChessGame::ChessGame(const ChessGame& other)
         black.push_back(std::shared_ptr<Pieces::Piece>(b->clone()));
 }
 
+const std::vector<ChessGame::History>& ChessGame::getHistory() const
+{
+    return m_history;
+}
+
 Pieces::Color ChessGame::playingColor()
 {
     return m_playingColor;
@@ -182,8 +187,9 @@ bool ChessGame::gameOver() const {
     return m_bGameOver;
 }
 
-void ChessGame::confirmMove()
+void ChessGame::confirmMove(ChessGame::History a_history)
 {
+    m_history.push_back(a_history);
     // Toggles playing color
     togglePlayingColor();
 

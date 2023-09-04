@@ -70,6 +70,11 @@ ChessboardField* ChessGameVisualisation::fieldAt(int x, int y)
 	return m_fields[y * BOARD_WIDTH + x].get();	
 }
 
+ChessboardField* ChessGameVisualisation::fieldAt(QPoint point)
+{
+	return fieldAt(point.x(), point.y());
+}
+
 ChessboardField* ChessGameVisualisation::fieldAtScenePos(QPointF a_scPos)
 {
 	for(int i = 0; i < m_fields.size(); i++)
@@ -141,6 +146,7 @@ void ChessGameVisualisation::display()
 
 void ChessGameVisualisation::markLegalMoves(std::shared_ptr<Pieces::Piece> a_piece)
 {
+#if MARK_MOVES
 	std::vector< std::shared_ptr<ChessboardField>> legal_fields;
 	for (std::shared_ptr<ChessboardField> field : m_fields)
 	{
@@ -153,6 +159,7 @@ void ChessGameVisualisation::markLegalMoves(std::shared_ptr<Pieces::Piece> a_pie
 
 	for (auto field : legal_fields)
 		field->setMarkLegal(true);
+#endif
 }
 
 void ChessGameVisualisation::markNoMoves()
@@ -188,12 +195,23 @@ bool ChessGameVisualisation::handlePieceDraggedFromTo(ChessboardField* drag_from
 
 		auto piece = drag_from->getPiece();
 
-		if (piece->move_valid(selX, selY, m_ChessGame))
+		// Use to get the position en passant would take 
+		std::shared_ptr<QPoint> beatenPoint;
+
+		if (piece->move_valid(selX, selY, m_ChessGame, &beatenPoint))
 		{
 			drag_to->cleanPiece();
+			if (beatenPoint)
+			{
+				ChessboardField* field;
+				if (field = fieldAt(*beatenPoint))
+				{				
+					field->cleanPiece();
+				}
+			}		
 			drag_to->setPiece(piece);
+            m_ChessGame.confirmMove(ChessGame::History(piece, piece->getBoardPos(), drop_pos.toPoint()));
 			piece->updatePosition(selX, selY);
-            m_ChessGame.confirmMove();
 			return true;
 		}
 	}
