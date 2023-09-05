@@ -127,8 +127,6 @@ void ChessboardField::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 	{
 		this->m_piece.reset();
 		m_pxmapItem.reset();
-	}else{
-		qDebug() << "Canceled";
 	}
 	m_draggedPiece.reset();
 }

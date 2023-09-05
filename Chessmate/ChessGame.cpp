@@ -55,8 +55,10 @@ void ChessGame::fillBackrow(Pieces::Color a_color, int a_col)
     addPiece	<Pieces::Rook>(a_color, 0, a_col);
     addPiece	<Pieces::Knight>(a_color, 1, a_col);
     addPiece	<Pieces::Bishop>(a_color, 2, a_col);
+    
     addPiece	<Pieces::Queen>(a_color, 3, a_col);
     addPiece	<Pieces::King>(a_color, 4, a_col);
+    
     addPiece	<Pieces::Bishop>(a_color, 5, a_col);
     addPiece	<Pieces::Knight>(a_color, 6, a_col);
     addPiece	<Pieces::Rook>(a_color, 7, a_col);
@@ -152,6 +154,19 @@ std::vector<std::shared_ptr<Pieces::Piece>> ChessGame::getListOfPieces()
     return all_pieces;
 }
 
+bool ChessGame::PlayerHasValidMoves() const
+{
+    auto playing_pieces = getListOfColor(m_playingColor);
+    for (auto piece : playing_pieces)
+    {
+        if (!piece->validMoves(*this).empty())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 void ChessGame::checkForWin()
 {
     using namespace Pieces;
@@ -170,15 +185,25 @@ void ChessGame::checkForWin()
         endGame(Color::Black);
     }
     else
-    {
-        // TODO: Check or stalemate
-
+    {        
         Pieces::King* checked_king = getKingFromList(m_playingColor);
         std::vector<std::shared_ptr<Pieces::Piece>> opposing_pieces = getListOfColor(oppositeColor(m_playingColor));
         // Check if players king is under Attack
-        if(checked_king->isAttacked(*this)) {
-            qDebug() << ((m_playingColor == Color::White) ? QString("White") : QString("Black")) << "King checked";
+
+        if (!PlayerHasValidMoves())
+        {
+            if(checked_king->isAttacked(*this)) 
+            {
+                qDebug() << "Checkmate";
+                endGame(oppositeColor(m_playingColor));
+            }
+            else
+            {
+                qDebug() << "Stalemate";
+                endGame(Color::None);
+            }
         }
+
     }
 }
 
@@ -226,8 +251,8 @@ void ChessGame::init()
 
     for (int x = 0; x < BOARD_WIDTH; ++x)
     {
-        addPiece <Pieces::Pawn> (Color::White, x, 6);
-        addPiece <Pieces::Pawn> (Color::Black, x, 1);
+        addPiece <Pieces::Pawn>(Color::White, x, 6);
+        addPiece <Pieces::Pawn> (Color::Black, x, 1);        
     }
 
     fillBackrow(Color::Black, 0);

@@ -53,10 +53,10 @@ namespace Pieces
 		bool abandons_king(int a_col, int a_row, const ChessGame& a_board) const;
 
 		void updatePosition(int a_col, int a_row);
-		bool move_valid(int a_col, int a_row, const ChessGame& a_board, std::shared_ptr<QPoint>* a_beatenPoint = nullptr);
+		bool move_valid(int a_col, int a_row, const ChessGame& a_board, std::shared_ptr<QPoint>* a_beatenPoint = nullptr) const;
 		bool isAttacked(const ChessGame& a_board) const;
 
-		
+		std::vector<QPoint> validMoves(const ChessGame& a_board) const;
 
         QPoint getBoardPos() const;
 

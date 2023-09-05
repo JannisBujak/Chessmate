@@ -34,8 +34,17 @@ int main(int argc, char** argv)
             playingPartyText->setText(QString("%1 team playing").arg(a_color == Color::White ? QString("White") : QString("Black")));
         });
     app->connect(pChessGameVisualisation->getChessGame(), &ChessGame::playerWon, [&](Color a_color)
-        {
-            playingPartyText->setText(QString("Player %1 won").arg(a_color == Color::White ? QString("white") : QString("black")));
+        {            
+            switch (a_color)
+            {
+            case Color::None:
+                playingPartyText->setText(QString("Stalemate"));
+                break;
+            case Color::White:
+            case Color::Black:
+                playingPartyText->setText(QString("Player %1 won").arg(a_color == Color::White ? QString("white") : QString("black")));
+                break;
+            }
         });
 
     auto restartGameButton = new QPushButton("Restart");

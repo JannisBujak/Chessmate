@@ -210,8 +210,8 @@ bool ChessGameVisualisation::handlePieceDraggedFromTo(ChessboardField* drag_from
 				}
 			}		
 			drag_to->setPiece(piece);
-            m_ChessGame.confirmMove(ChessGame::History(piece, piece->getBoardPos(), drop_pos.toPoint()));
 			piece->updatePosition(selX, selY);
+            m_ChessGame.confirmMove(ChessGame::History(piece, piece->getBoardPos(), drop_pos.toPoint()));
 			return true;
 		}
 	}

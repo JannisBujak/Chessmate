@@ -139,7 +139,6 @@ namespace Pieces
 			{
 				if (a_board.pieceAt(m_column + xMov * i, m_row + yMov * i))
 				{
-					qDebug() << "Piece Blocking";
 					return true;
 				}
 			}
@@ -153,7 +152,6 @@ namespace Pieces
 			if (piece->m_color == m_color)
 			{
 				// Allie -> cant take			
-				qDebug() << "Cant take allie";
 				return true;
 			}
 		}
@@ -202,7 +200,7 @@ namespace Pieces
         this->m_timesMoved++;
 	}
 
-	bool Piece::move_valid(int a_col, int a_row, const ChessGame& a_board, std::shared_ptr<QPoint>* a_beatenPoint)
+	bool Piece::move_valid(int a_col, int a_row, const ChessGame& a_board, std::shared_ptr<QPoint>* a_beatenPoint) const
 	{
 		return !same_pos(a_col, a_row)
 			&& piece_moveable(a_col, a_row, a_board, a_beatenPoint)
@@ -225,6 +223,22 @@ namespace Pieces
         }
         return false;
     }
+
+	std::vector<QPoint> Piece::validMoves(const ChessGame& a_board) const
+	{
+		std::vector<QPoint> moves;
+		for (int y = 0; y < BOARD_HEIGHT; y++)
+		{
+			for (int x = 0; x < BOARD_WIDTH; x++) 
+			{
+				if (this->move_valid(x, y, a_board, nullptr))
+				{
+					moves.push_back(QPoint(x, y));
+				}
+			}
+		}
+		return moves;
+	}
 
     Pawn::Pawn(int a_col, int a_row, Color a_color)
 		: Piece(a_col, a_row, a_color)

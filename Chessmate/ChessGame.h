@@ -75,6 +75,7 @@ public:
     std::vector<std::shared_ptr<Pieces::Piece>>& getListOfColor(Pieces::Color a_color);
     std::vector<std::shared_ptr<Pieces::Piece>> getListOfPieces();
 
+    bool PlayerHasValidMoves() const;
     void checkForWin();
     void endGame(Pieces::Color a_WinningColor);
     bool gameOver() const;
