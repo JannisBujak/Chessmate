@@ -1,6 +1,7 @@
 #include "Pieces.h"
 
 #include "ChessGameVisualisation.h"
+#include <ranges>
 
 namespace Pieces
 {
@@ -44,23 +45,23 @@ namespace Pieces
 		}
 	}
 
-	bool Pawn::en_passant_counter_possible(int a_col, int a_row, const ChessGame& a_board, std::shared_ptr<QPoint>* a_beatenPoint) const 
+	bool Pawn::en_passant_possible(int a_col, int a_row, const ChessGame& a_board, std::shared_ptr<QPoint>* a_beatenPoint) const 
 	{
 		Pieces::Pawn* p;
 		if ((p = dynamic_cast<Pieces::Pawn*>(a_board.pieceAt(a_col, m_row).get())) && (m_color != p->getColor()))
 		{
-			// en passant counter
+			// en passant
 			if ((p->timesMoved() == 1) && (abs(p->m_row - p->m_origRow) >= 2))
 			{
-				// Check if last move was to QPoint(a_col, m_row), En passant-counter is only available for 1 round
+				// Check if last move was to QPoint(a_col, m_row), En passant is only available for 1 round
 				auto history = a_board.getHistory();
-				bool en_passant_counter_possible = !history.empty() && history.back().to == QPoint(a_col, m_row);
-				if (en_passant_counter_possible)
+				bool en_passant_possible = !history.empty() && history.back().to == QPoint(a_col, m_row);
+				if (en_passant_possible)
 				{
 					if (a_beatenPoint)
 						a_beatenPoint->reset(new QPoint(a_col, m_row));
 				}
-				return en_passant_counter_possible;
+				return en_passant_possible;
 			}
 		}
 		return false;
@@ -86,9 +87,9 @@ namespace Pieces
                 {
                     return true;
                 }
-                else if (en_passant_counter_possible(a_col, a_row, a_board, a_beatenPoint))
+                else if (en_passant_possible(a_col, a_row, a_board, a_beatenPoint))
                 {
-                    // en passant counter
+                    // en passant
 					return true;
                 }
             }
@@ -198,6 +199,11 @@ namespace Pieces
 		this->m_column = a_col;
 		this->m_row = a_row;
         this->m_timesMoved++;
+	}
+
+	void Piece::updatePosition(QPoint a_point)
+	{
+		updatePosition(a_point.x(), a_point.y());
 	}
 
 	bool Piece::move_valid(int a_col, int a_row, const ChessGame& a_board, std::shared_ptr<QPoint>* a_beatenPoint) const
@@ -400,9 +406,66 @@ namespace Pieces
 		};
 	}
 
-	bool King::piece_moveable(int a_col, int a_row, const ChessGame& a_board, std::shared_ptr<QPoint>* a_beatenPoint) const
+	bool King::pieces_blocking(int xStep, const Pieces::Rook* a_rook, const ChessGame& a_board) const
+	{		
+		// Now check if there are pieces in the way
+		for (int x = m_column + xStep; x != a_rook->getBoardPos().x(); x += xStep)
+		{
+			if (a_board.pieceAt(x, m_row))
+				return true;
+		}
+		return false;
+	}
+
+	bool King::check_castle_possible(int a_col, int a_row, const ChessGame& a_board, std::shared_ptr<QPoint>* a_beatenPoint) const
 	{
-		return (abs(a_col - m_column) <= 1) && (abs(a_row - m_row) <= 1);
+		QPoint gradient(a_col - m_column, a_row - m_row);
+		
+		// Castle: King is moved two fields to the left/right when not being attacked
+		if (this->m_timesMoved > 0
+			|| abs(gradient.x()) != 2
+			|| abs(gradient.y()) != 0
+			|| this->isAttacked(a_board))
+		{
+			return false;
+		}
+
+		auto cast = [](std::shared_ptr<Pieces::Piece> piece)
+		{
+			return dynamic_cast<Pieces::Rook*>(piece.get());
+		};
+				
+		auto team_list = a_board.getListOfColor(m_color);
+		
+		for (Pieces::Rook* rook : team_list
+			| std::views::filter(cast)
+			| std::views::transform(cast))
+		{
+			// Check if King is moved towards this rook
+			auto iDistFactor = ( rook->getBoardPos().x() - getBoardPos().x()) * gradient.x();
+			auto bMovingTowardsRook = (iDistFactor >= 0);
+			
+			// Check if Rook is not moved as well 
+			if (rook->timesMoved() == 0 && bMovingTowardsRook)
+			{				
+				int xStep = gradient.x() / abs(gradient.x());
+				if (!pieces_blocking(xStep, rook, a_board))
+				{
+					if (a_beatenPoint)
+						a_beatenPoint->reset(new QPoint(rook->getBoardPos()));
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	bool King::piece_moveable(int a_col, int a_row, const ChessGame& a_board, std::shared_ptr<QPoint>* a_beatenPoint) const
+	{		
+		if ((abs(a_col - m_column) <= 1) && (abs(a_row - m_row) <= 1))
+			return true;
+		else 
+			return check_castle_possible(a_col, a_row, a_board, a_beatenPoint);
 	}
 
 	Piece* King::clone() const

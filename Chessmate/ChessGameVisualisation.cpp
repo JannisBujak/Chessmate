@@ -196,17 +196,34 @@ bool ChessGameVisualisation::handlePieceDraggedFromTo(ChessboardField* drag_from
 		auto piece = drag_from->getPiece();
 
 		// Use to get the position en passant would take 
-		std::shared_ptr<QPoint> beatenPoint;
+		std::shared_ptr<QPoint> sideeffectPos;
 
-		if (piece->move_valid(selX, selY, m_ChessGame, &beatenPoint))
+		if (piece->move_valid(selX, selY, m_ChessGame, &sideeffectPos))
 		{
 			drag_to->cleanPiece();
-			if (beatenPoint)
+			if (sideeffectPos)
 			{
-				ChessboardField* field;
-				if (field = fieldAt(*beatenPoint))
-				{				
-					field->cleanPiece();
+				ChessboardField* sideeffectField;
+				if (sideeffectField = fieldAt(*sideeffectPos))
+				{		
+					if (piece->getColor() == sideeffectField->getPiece()->getColor())
+					{
+						 // Another piece of same color moved -> Castle
+						auto rook = dynamic_cast<Pieces::Rook*>(sideeffectField->getPiece().get());
+
+						QPoint new_rookpos = QPoint(
+							(selX + piece->getBoardPos().x()) / 2,
+							(selY + piece->getBoardPos().y()) / 2);
+						rook->updatePosition(new_rookpos);
+						
+						fieldAt(new_rookpos)->setPiece(sideeffectField->getPiece());
+						sideeffectField->setPiece();
+					}
+					else
+					{
+						// Another piece of other color moved -> En passant
+						sideeffectField->cleanPiece();
+					}
 				}
 			}		
 			drag_to->setPiece(piece);

@@ -53,6 +53,7 @@ namespace Pieces
 		bool abandons_king(int a_col, int a_row, const ChessGame& a_board) const;
 
 		void updatePosition(int a_col, int a_row);
+		void updatePosition(QPoint a_point);
 		bool move_valid(int a_col, int a_row, const ChessGame& a_board, std::shared_ptr<QPoint>* a_beatenPoint = nullptr) const;
 		bool isAttacked(const ChessGame& a_board) const;
 
@@ -71,7 +72,7 @@ namespace Pieces
 		virtual QString piece_name() const override;
 		virtual QPixmap& get_pxmap() override;
 		
-		bool en_passant_counter_possible(int a_col, int a_row, const ChessGame& a_board, std::shared_ptr<QPoint>* a_beatenPoint) const;
+		bool en_passant_possible(int a_col, int a_row, const ChessGame& a_board, std::shared_ptr<QPoint>* a_beatenPoint) const;
 
 		bool piece_moveable(int a_col, int a_row, const ChessGame& a_board, std::shared_ptr<QPoint>* a_beatenPoint) const override;
 
@@ -85,6 +86,7 @@ namespace Pieces
 
 		virtual QString piece_name() const override;
 		virtual QPixmap& get_pxmap() override;
+
 		bool piece_moveable(int a_col, int a_row, const ChessGame& a_board, std::shared_ptr<QPoint>* a_beatenPoint) const override;
 
 		virtual Piece* clone() const;
@@ -129,6 +131,9 @@ namespace Pieces
 
 		virtual QString piece_name() const override;
 		virtual QPixmap& get_pxmap() override;
+		
+		bool pieces_blocking(int xStep, const Pieces::Rook* a_rook, const ChessGame& a_board) const;
+		bool check_castle_possible(int a_col, int a_row, const ChessGame& a_board, std::shared_ptr<QPoint>* a_beatenPoint) const;
 		bool piece_moveable(int a_col, int a_row, const ChessGame& a_board, std::shared_ptr<QPoint>* a_beatenPoint) const override;
 
 		virtual Piece* clone() const;
